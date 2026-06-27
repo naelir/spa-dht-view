@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dht meta view</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+          crossorigin="anonymous" />
+    <style>
+        body { background: #f4f6f8; }
+        .card-header { background: #212529; color: #fff; }
+        .hash-col { font-family: "Courier New", monospace; font-size: .8rem; word-break: break-all; }
+        .page-link { cursor: pointer; }
+        thead th { user-select: none; white-space: nowrap; }
+        .spinner-wrapper { min-height: 200px; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+<div id="app" class="container-lg py-4">
+
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-4 gap-3">
+        <h2 class="mb-0">🔍 ___</h2>
+        <span v-if="!loading" class="badge bg-secondary fs-6">{{ total.toLocaleString() }} total</span>
+    </div>
+
+    <!-- Error banner -->
+    <div v-if="error" class="alert alert-danger alert-dismissible" role="alert">
+        {{ error }}
+        <button type="button" class="btn-close" @click="error = null"></button>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body py-2">
+            <div class="row align-items-center g-2">
+                <div class="col-auto">
+                    <label class="col-form-label text-muted small">Rows per page:</label>
+                </div>
+                <div class="col-auto">
+                    <select class="form-select form-select-sm" v-model.number="pageSize" @change="onPageSizeChange">
+                        <option :value="10">10</option>
+                        <option :value="20">20</option>
+                        <option :value="50">50</option>
+                        <option :value="100">100</option>
+                    </select>
+                </div>
+                <div class="col-auto ms-auto">
+                    <button class="btn btn-sm btn-outline-primary" @click="fetchEntries" :disabled="loading">
+                        ↻ Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table card -->
+    <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Entries</span>
+            <small class="text-secondary">
+                Page {{ page }} of {{ totalPages || 1 }}
+            </small>
+        </div>
+
+        <!-- Loading state -->
+        <div v-if="loading" class="spinner-wrapper">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading…</span>
+            </div>
+        </div>
+
+        <!-- Data table -->
+        <div v-else class="table-responsive">
+            <table class="table table-hover table-sm align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th style="width:80px">#&nbsp;ID</th>
+                        <th>Name</th>
+                        <th class="hash-col">Info Hash</th>
+                        <th style="width:80px" class="text-center">Files</th>
+                        <th style="width:80px" class="text-center">nfo</th>
+                        <th style="width:180px">Found</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-if="entries.length === 0">
+                        <td colspan="5" class="text-center text-muted py-5">No entries found.</td>
+                    </tr>
+                    <tr v-for="e in entries" :key="e.id">
+                        <td class="text-muted small">{{ e.id }}</td>
+                        <td>{{ e.name || '—' }}</td>
+                        <td class="hash-col text-secondary">{{ e.hash || '—' }}</td>
+                        <td class="text-center">{{ e.fileCount }}</td>
+                        <td class="text-center">{{ e.nfo }}</td>
+                        <td class="small">{{ formatDate(e.foundTime) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination footer -->
+        <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <small class="text-muted">
+                Showing
+                {{ entries.length === 0 ? 0 : (page - 1) * pageSize + 1 }}–{{ (page - 1) * pageSize + entries.length }}
+                of {{ total.toLocaleString() }}
+            </small>
+            <nav aria-label="Table pagination">
+                <ul class="pagination pagination-sm mb-0">
+                    <!-- First / Prev -->
+                    <li class="page-item" :class="{ disabled: page <= 1 }">
+                        <span class="page-link" @click="goToPage(1)" title="First">«</span>
+                    </li>
+                    <li class="page-item" :class="{ disabled: page <= 1 }">
+                        <span class="page-link" @click="goToPage(page - 1)">‹</span>
+                    </li>
+
+                    <!-- Ellipsis before -->
+                    <li v-if="visiblePages[0] > 1" class="page-item disabled">
+                        <span class="page-link">…</span>
+                    </li>
+
+                    <!-- Page numbers -->
+                    <li v-for="p in visiblePages" :key="p"
+                        class="page-item" :class="{ active: p === page }">
+                        <span class="page-link" @click="goToPage(p)">{{ p }}</span>
+                    </li>
+
+                    <!-- Ellipsis after -->
+                    <li v-if="visiblePages[visiblePages.length - 1] < totalPages" class="page-item disabled">
+                        <span class="page-link">…</span>
+                    </li>
+
+                    <!-- Next / Last -->
+                    <li class="page-item" :class="{ disabled: page >= totalPages }">
+                        <span class="page-link" @click="goToPage(page + 1)">›</span>
+                    </li>
+                    <li class="page-item" :class="{ disabled: page >= totalPages }">
+                        <span class="page-link" @click="goToPage(totalPages)" title="Last">»</span>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Vue 3 + Axios from CDN (no build step required) -->
+<script src="https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios@1.7.9/dist/axios.min.js"></script>
+<script>
+    const { createApp } = Vue;
+
+    createApp({
+        data() {
+            return {
+                entries:    [],
+                total:      0,
+                page:       1,
+                pageSize:   20,
+                totalPages: 0,
+                loading:    false,
+                error:      null
+            };
+        },
+
+        computed: {
+            /**
+             * Show at most 5 page numbers centred around the current page.
+             */
+            visiblePages() {
+                const delta = 2;
+                const start = Math.max(1, this.page - delta);
+                const end   = Math.min(this.totalPages || 1, this.page + delta);
+                const pages = [];
+                for (let i = start; i <= end; i++) pages.push(i);
+                return pages;
+            }
+        },
+
+        methods: {
+            async fetchEntries() {
+                this.loading = true;
+                this.error   = null;
+                try {
+                    const { data } = await axios.get('/api/entries', {
+                        params: { page: this.page, pageSize: this.pageSize }
+                    });
+                    this.entries    = data.entries    ?? [];
+                    this.total      = data.total      ?? 0;
+                    this.totalPages = data.totalPages ?? Math.ceil(this.total / this.pageSize);
+                } catch (err) {
+                    this.error = 'Failed to load entries: ' +
+                        (err.response?.data?.message ?? err.message);
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            goToPage(p) {
+                const max = this.totalPages || 1;
+                if (p < 1 || p > max || p === this.page) return;
+                this.page = p;
+                this.fetchEntries();
+            },
+
+            onPageSizeChange() {
+                this.page = 1;
+                this.fetchEntries();
+            },
+
+            formatDate(ts) {
+                if (!ts) return '—';
+                return new Date(ts).toLocaleString(undefined, {
+                    year: 'numeric', month: 'short', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit'
+                });
+            }
+        },
+
+        mounted() {
+            this.fetchEntries();
+        }
+    }).mount('#app');
+</script>
+</body>
+</html>
