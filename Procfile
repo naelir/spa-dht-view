@@ -1,0 +1,1 @@
+web: java -DSERVER_PORT=${SERVER_PORT:-8000} -DDB_TYPE=${DB_TYPE:-mongo} -DDATABASE_URL=${DATABASE_URL:-mongodb://localhost:27017} -DDATABASE_NAME=${DATABASE_NAME:-dht_view} -DMAIN_TABLE=${MAIN_TABLE:-hashes} $JAVA_OPTS -jar target/spa-dht-view-0.0.1-SNAPSHOT-jar-with-dependencies.jar

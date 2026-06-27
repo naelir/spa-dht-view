@@ -20,5 +20,8 @@ public class Entry {
     @JsonProperty("nfo")
     public boolean nfo;
 
+    @JsonProperty("genre")
+    public String genre;
+    
     public Entry() {}
 }

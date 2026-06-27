@@ -23,8 +23,8 @@ import org.glassfish.jersey.servlet.ServletContainer;
 public class Application {
 
     public static void main(String[] args) throws Exception {
-        int    port     = Integer.parseInt(System.getProperty("server.port", "8080"));
-        String repoType = System.getProperty("repo", "memory");
+        int    port     = Integer.parseInt(System.getProperty("SERVER_PORT", "8000"));
+        String repoType = System.getProperty("DB_TYPE", "mongo");
 
         EntryRepository repo;
         if ("memory".equalsIgnoreCase(repoType)) {
@@ -32,9 +32,10 @@ public class Application {
             repo = new InMemoryEntryRepository();
         } else {
             String mongoUri = System.getProperty("DATABASE_URL", "mongodb://localhost:27017");
-            String mongoDb  = System.getProperty("mongo.db", "dht_view");
+            String mongoDb  = System.getProperty("DATABASE_NAME", "dht_view");
+            String table  = System.getProperty("MAIN_TABLE", "hashes");
             System.out.printf("Using MongoEntryRepository  uri=%s  db=%s%n", mongoUri, mongoDb);
-            repo = new MongoEntryRepository(mongoUri, mongoDb);
+            repo = new MongoEntryRepository(mongoUri, mongoDb, table);
         }
 
         // ----- Jetty 12 EE11 setup -----

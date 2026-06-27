@@ -20,10 +20,10 @@ public class MongoEntryRepository implements EntryRepository {
 
     private final MongoCollection<Document> collection;
 
-    public MongoEntryRepository(String connectionString, String dbName) {
+    public MongoEntryRepository(String connectionString, String dbName, String collectionName) {
         MongoClient client = MongoClients.create(connectionString);
         MongoDatabase database = client.getDatabase(dbName);
-        this.collection = database.getCollection("entries");
+        this.collection = database.getCollection(collectionName);
         ensureIndexes();
     }
 
@@ -107,6 +107,7 @@ public class MongoEntryRepository implements EntryRepository {
     private static Document toDocument(Entry e) {
         return new Document("hash", e.hash)
                 .append("name", e.name)
+                .append("genre", e.genre)
                 .append("fileCount", e.fileCount)
                 .append("foundTime", e.foundTime)
                 .append("nfo", e.nfo);
@@ -116,6 +117,7 @@ public class MongoEntryRepository implements EntryRepository {
         Entry e = new Entry();
         e.name      = doc.getString("name");
         e.hash      = doc.getString("hash");
+        e.genre      = doc.getString("genre");
         Integer fc  = doc.getInteger("fileCount");
         e.fileCount = fc != null ? fc : 0;
         e.foundTime = toLong(doc.get("foundTime"));
