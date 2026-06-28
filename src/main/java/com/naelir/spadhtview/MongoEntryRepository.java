@@ -110,7 +110,7 @@ public class MongoEntryRepository implements EntryRepository {
                 .append("genre", e.genre)
                 .append("fileCount", e.fileCount)
                 .append("foundTime", e.foundTime)
-                .append("nfo", e.nfo);
+                .append("size", e.size);
     }
 
     private static Entry fromDocument(Document doc) {
@@ -121,8 +121,7 @@ public class MongoEntryRepository implements EntryRepository {
         Integer fc  = doc.getInteger("fileCount");
         e.fileCount = fc != null ? fc : 0;
         e.foundTime = toLong(doc.get("foundTime"));
-        Boolean nfo = doc.getBoolean("nfo");
-        e.nfo       = nfo != null && nfo;
+        e.size       = toLong(doc.get("size"));
         return e;
     }
 

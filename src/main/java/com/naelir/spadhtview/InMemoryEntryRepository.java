@@ -76,10 +76,11 @@ public class InMemoryEntryRepository implements EntryRepository {
     private static Entry copy(Entry src) {
         Entry dst = new Entry();
         dst.name      = src.name;
+        dst.genre      = src.genre;
         dst.hash      = src.hash;
         dst.fileCount = src.fileCount;
         dst.foundTime = src.foundTime;
-        dst.nfo       = src.nfo;
+        dst.size       = src.size;
         return dst;
     }
 }
