@@ -36,10 +36,25 @@
     <div class="card mb-3 shadow-sm">
         <div class="card-body py-2">
             <div class="row align-items-center g-2">
-                <div class="col-auto">
+                <!-- Search field -->
+                <div class="col">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text">🔎</span>
+                        <input type="text"
+                               class="form-control"
+                               placeholder="Search by name…"
+                               v-model.trim="searchQuery"
+                               @keyup.enter="onSearch"
+                               @input="onSearchInput" />
+                        <button class="btn btn-primary" @click="onSearch" :disabled="loading">Search</button>
+                        <button v-if="isSearchMode" class="btn btn-outline-secondary" @click="clearSearch" title="Clear search">✕</button>
+                    </div>
+                </div>
+                <!-- Rows per page (hidden while searching) -->
+                <div v-if="!isSearchMode" class="col-auto">
                     <label class="col-form-label text-muted small">Rows per page:</label>
                 </div>
-                <div class="col-auto">
+                <div v-if="!isSearchMode" class="col-auto">
                     <select class="form-select form-select-sm" v-model.number="pageSize" @change="onPageSizeChange">
                         <option :value="10">10</option>
                         <option :value="20">20</option>
@@ -47,8 +62,8 @@
                         <option :value="100">100</option>
                     </select>
                 </div>
-                <div class="col-auto ms-auto">
-                    <button class="btn btn-sm btn-outline-primary" @click="fetchEntries" :disabled="loading">
+                <div class="col-auto">
+                    <button v-if="!isSearchMode" class="btn btn-sm btn-outline-primary" @click="fetchEntries" :disabled="loading">
                         ↻ Refresh
                     </button>
                 </div>
@@ -59,9 +74,11 @@
     <!-- Table card -->
     <div class="card shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <span>Entries</span>
+            <span v-if="isSearchMode">Search results for <em>"{{ activeSearch }}"</em></span>
+            <span v-else>Entries</span>
             <small class="text-secondary">
-                Page {{ page }} of {{ totalPages || 1 }}
+                <span v-if="isSearchMode">{{ entries.length }} result(s)</span>
+                <span v-else>Page {{ page }} of {{ totalPages || 1 }}</span>
             </small>
         </div>
 
@@ -79,30 +96,40 @@
                     <tr>
                         <th style="width:80px">#&nbsp;genre</th>
                         <th>name</th>
-                        <th class="hash-col">info hash</th>
+                        <th class="hash-col">hash</th>
                         <th style="width:80px" class="text-center">files</th>
-                        <th style="width:80px" class="text-center">nfo</th>
+                        <th style="width:80px" class="text-center">size</th>
                         <th style="width:180px">found</th>
+                        <th style="width:80px" class="text-center">link</th>
+                        <th style="width:60px" class="text-center">del</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-if="entries.length === 0">
-                        <td colspan="5" class="text-center text-muted py-5">No entries found.</td>
+                        <td colspan="8" class="text-center text-muted py-5">No entries found.</td>
                     </tr>
                     <tr v-for="e in entries" :key="e.id">
-                        <td class="text-muted small">{{ e.genre }}</td>
+                        <td class="text-center">{{ e.genre }}</td>
                         <td>{{ e.name || '—' }}</td>
                         <td class="hash-col text-secondary">{{ e.hash || '—' }}</td>
                         <td class="text-center">{{ e.fileCount }}</td>
-                        <td class="text-center">{{ e.nfo }}</td>
+                        <td class="text-center">{{ formatBytes(e.size) }}</td>
                         <td class="small">{{ formatDate(e.foundTime) }}</td>
+                        <td class="text-center">
+                            <a :href="entryLink(e)">-</a>
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-danger btn-sm py-0 px-1"
+                                    title="Delete"
+                                    @click="deleteEntry(e.hash)">🗑</button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Pagination footer -->
-        <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <!-- Pagination footer (hidden during search) -->
+        <div v-if="!isSearchMode" class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
             <small class="text-muted">
                 Showing
                 {{ entries.length === 0 ? 0 : (page - 1) * pageSize + 1 }}–{{ (page - 1) * pageSize + entries.length }}
@@ -156,13 +183,16 @@
     createApp({
         data() {
             return {
-                entries:    [],
-                total:      0,
-                page:       1,
-                pageSize:   20,
-                totalPages: 0,
-                loading:    false,
-                error:      null
+                entries:      [],
+                total:        0,
+                page:         1,
+                pageSize:     20,
+                totalPages:   0,
+                loading:      false,
+                error:        null,
+                searchQuery:  '',
+                activeSearch: '',
+                isSearchMode: false
             };
         },
 
@@ -199,6 +229,46 @@
                 }
             },
 
+            async searchEntries() {
+                this.loading = true;
+                this.error   = null;
+                try {
+                    const { data } = await axios.get('/api/entries/search', {
+                        params: { name: this.activeSearch }
+                    });
+                    this.entries = Array.isArray(data) ? data : (data.entries ?? []);
+                } catch (err) {
+                    this.error = 'Search failed: ' +
+                        (err.response?.data?.message ?? err.message);
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            onSearch() {
+                if (!this.searchQuery) {
+                    this.clearSearch();
+                    return;
+                }
+                this.activeSearch = this.searchQuery;
+                this.isSearchMode = true;
+                this.searchEntries();
+            },
+
+            onSearchInput() {
+                if (!this.searchQuery) {
+                    this.clearSearch();
+                }
+            },
+
+            clearSearch() {
+                this.searchQuery  = '';
+                this.activeSearch = '';
+                this.isSearchMode = false;
+                this.page         = 1;
+                this.fetchEntries();
+            },
+
             goToPage(p) {
                 const max = this.totalPages || 1;
                 if (p < 1 || p > max || p === this.page) return;
@@ -214,9 +284,45 @@
             formatDate(ts) {
                 if (!ts) return '—';
                 return new Date(ts).toLocaleString(undefined, {
-                    year: 'numeric', month: 'short', day: '2-digit',
-                    hour: '2-digit', minute: '2-digit', second: '2-digit'
+                    year: 'numeric', month: 'short', day: '2-digit'
                 });
+            },
+            
+            formatBytes(bytes) {
+            
+			  const units = ["B", "KB", "MB", "GB", "TB", "PB", "EB"];
+			
+			  if (bytes === 0 || bytes < 0) {
+			    return "0.00B";
+			  }
+			
+			  const index = Math.min(
+			    Math.floor(Math.log(bytes) / Math.log(1024)),
+			    units.length - 1
+			  );
+			
+			  const value = bytes / Math.pow(1024, index);
+			
+			  return `${value.toFixed(2)}${units[index]}`;
+			},
+			
+            entryLink(e) {
+                return `magnet:?xt=urn:btih:${e.hash}&dn=${e.name}&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce`;
+            },
+
+            async deleteEntry(hash) {
+                if (!hash) return;
+                try {
+                    await axios.delete(`/api/entries/${hash}`);
+                    if (this.isSearchMode) {
+                        this.searchEntries();
+                    } else {
+                        this.fetchEntries();
+                    }
+                } catch (err) {
+                    this.error = 'Delete failed: ' +
+                        (err.response?.data?.message ?? err.message);
+                }
             }
         },
 

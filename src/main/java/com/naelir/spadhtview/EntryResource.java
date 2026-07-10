@@ -5,6 +5,7 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -117,5 +118,20 @@ public class EntryResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         return Response.ok(entry).build();
+    }
+
+    /**
+     * DELETE /api/entries/{hash}
+     * Removes an existing entry by its info-hash.
+     * Returns 204 No Content on success, 404 if not found.
+     */
+    @DELETE
+    @Path("/{hash}")
+    public Response delete(@PathParam("hash") String hash) {
+        boolean removed = repo.remove(hash);
+        if (!removed) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.noContent().build();
     }
 }

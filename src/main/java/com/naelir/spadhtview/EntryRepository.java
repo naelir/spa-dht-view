@@ -28,4 +28,11 @@ public interface EntryRepository {
      * @return {@code true} if an entry was actually replaced.
      */
     boolean update(Entry entry);
+
+    /**
+     * Removes an existing entry identified by its hash.
+     *
+     * @return {@code true} if an entry was actually removed.
+     */
+    boolean remove(String hash);
 }

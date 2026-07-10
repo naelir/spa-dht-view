@@ -1,5 +1,12 @@
 package com.naelir.spadhtview;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import org.bson.Document;
+import org.bson.conversions.Bson;
+
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -9,12 +16,6 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOptions;
-import org.bson.Document;
-import org.bson.conversions.Bson;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 public class MongoEntryRepository implements EntryRepository {
 
@@ -46,8 +47,14 @@ public class MongoEntryRepository implements EntryRepository {
 
     @Override
     public List<Entry> findByName(String pattern) {
-        // Case-insensitive regex – equivalent to SQL LIKE '%pattern%'
-        Pattern regex = Pattern.compile(Pattern.quote(pattern), Pattern.CASE_INSENSITIVE);
+        // Split on spaces so that each space acts as a wildcard matching any sequence of characters.
+        String[] parts = pattern.split(" ", -1);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < parts.length; i++) {
+            if (i > 0) sb.append(".*");
+            sb.append(Pattern.quote(parts[i]));
+        }
+        Pattern regex = Pattern.compile(sb.toString(), Pattern.CASE_INSENSITIVE);
         List<Entry> results = new ArrayList<>();
         collection.find(Filters.regex("name", regex))
                 .sort(new Document("foundTime", -1))
@@ -100,6 +107,12 @@ public class MongoEntryRepository implements EntryRepository {
         return doc != null ? fromDocument(doc) : null;
     }
 
+    @Override
+    public boolean remove(String hash) {
+        long deleted = collection.deleteOne(Filters.eq("hash", hash)).getDeletedCount();
+        return deleted > 0;
+    }
+
     // -------------------------------------------------------------------------
     // helpers
     // -------------------------------------------------------------------------
@@ -110,7 +123,7 @@ public class MongoEntryRepository implements EntryRepository {
                 .append("genre", e.genre)
                 .append("fileCount", e.fileCount)
                 .append("foundTime", e.foundTime)
-                .append("nfo", e.nfo);
+                .append("size", e.size);
     }
 
     private static Entry fromDocument(Document doc) {
@@ -121,8 +134,7 @@ public class MongoEntryRepository implements EntryRepository {
         Integer fc  = doc.getInteger("fileCount");
         e.fileCount = fc != null ? fc : 0;
         e.foundTime = toLong(doc.get("foundTime"));
-        Boolean nfo = doc.getBoolean("nfo");
-        e.nfo       = nfo != null && nfo;
+        e.size       = toLong(doc.get("size"));
         return e;
     }
 

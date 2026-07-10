@@ -17,8 +17,8 @@ public class Entry {
     @JsonProperty("foundTime")
     public long foundTime;
     
-    @JsonProperty("nfo")
-    public boolean nfo;
+    @JsonProperty("size")
+    public long size;
 
     @JsonProperty("genre")
     public String genre;
