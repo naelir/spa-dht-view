@@ -47,6 +47,8 @@ public class MongoEntryRepository implements EntryRepository {
 
     @Override
     public List<Entry> findByName(String pattern) {
+        if (pattern == null || pattern.trim().length() < 3)
+            return List.of();
         // Split on spaces so that each space acts as a wildcard matching any sequence of characters.
         String[] parts = pattern.split(" ", -1);
         StringBuilder sb = new StringBuilder();
@@ -58,6 +60,7 @@ public class MongoEntryRepository implements EntryRepository {
         List<Entry> results = new ArrayList<>();
         collection.find(Filters.regex("name", regex))
                 .sort(new Document("foundTime", -1))
+                .limit(200)
                 .forEach(doc -> results.add(fromDocument(doc)));
         return results;
     }

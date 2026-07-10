@@ -43,10 +43,18 @@ public class InMemoryEntryRepository implements EntryRepository {
 
     @Override
     public List<Entry> findByName(String pattern) {
-        Pattern regex = Pattern.compile(Pattern.quote(pattern), Pattern.CASE_INSENSITIVE);
+        if (pattern == null || pattern.length() < 3) return List.of();
+        String[] parts = pattern.split(" ", -1);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < parts.length; i++) {
+            if (i > 0) sb.append(".*");
+            sb.append(Pattern.quote(parts[i]));
+        }
+        Pattern regex = Pattern.compile(sb.toString(), Pattern.CASE_INSENSITIVE);
         return store.stream()
                 .filter(e -> e.name != null && regex.matcher(e.name).find())
                 .sorted(Comparator.comparingLong((Entry e) -> e.foundTime).reversed())
+                .limit(200)
                 .toList();
     }
 
