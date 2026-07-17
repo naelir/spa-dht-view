@@ -65,7 +65,7 @@ public class Application {
         jerseyHolder.setInitOrder(0);
         context.addServlet(jerseyHolder, "/*");
 
-        server.setHandler(context);
+        server.setHandler(new IpBlockingHandler(context));
         server.start();
         System.out.printf("DHT View started on http://localhost:%d/%n", port);
         server.join();
