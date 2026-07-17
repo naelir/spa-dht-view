@@ -100,8 +100,8 @@
                         <th style="width:80px" class="text-center">файлове</th>
                         <th style="width:80px" class="text-center">размер</th>
                         <th style="width:100px">намерен</th>
-                        <th style="width:80px" class="text-center"></th>
-                        <th style="width:60px" class="text-center"></th>
+<!--                         <th style="width:80px" class="text-center"></th> -->
+<!--                         <th style="width:60px" class="text-center"></th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -115,14 +115,14 @@
                         <td class="text-center">{{ e.fileCount }}</td>
                         <td class="text-center">{{ formatBytes(e.size) }}</td>
                         <td class="small">{{ formatDate(e.foundTime) }}</td>
-                        <td class="text-center">
-                            <a :href="entryLink(e)">-</a>
-                        </td>
-                        <td class="text-center">
-                            <button class="btn btn-danger btn-sm py-0 px-1"
-                                    title="Delete"
-                                    @click="deleteEntry(e.hash)">🗑</button>
-                        </td>
+<!--                         <td class="text-center"> -->
+<!--                             <a :href="entryLink(e)">-</a> -->
+<!--                         </td> -->
+<!--                         <td class="text-center"> -->
+<!--                             <button class="btn btn-danger btn-sm py-0 px-1" -->
+<!--                                     title="Delete" -->
+<!--                                     @click="deleteEntry(e.hash)">🗑</button> -->
+<!--                         </td> -->
                     </tr>
                 </tbody>
             </table>
