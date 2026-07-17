@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dht meta view</title>
+    <title>дхт списък</title>
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
@@ -23,7 +23,7 @@
     <!-- Header -->
     <div class="d-flex align-items-center mb-4 gap-3">
         <h2 class="mb-0">🔍 ___</h2>
-        <span v-if="!loading" class="badge bg-secondary fs-6">{{ total.toLocaleString() }} total</span>
+        <span v-if="!loading" class="badge bg-secondary fs-6">{{ total.toLocaleString() }} общо</span>
     </div>
 
     <!-- Error banner -->
@@ -42,17 +42,17 @@
                         <span class="input-group-text">🔎</span>
                         <input type="text"
                                class="form-control"
-                               placeholder="Search by name…"
+                               placeholder="потърси по име…"
                                v-model.trim="searchQuery"
                                @keyup.enter="onSearch"
                                @input="onSearchInput" />
-                        <button class="btn btn-primary" @click="onSearch" :disabled="loading">Search</button>
+                        <button class="btn btn-primary" @click="onSearch" :disabled="loading">потърси</button>
                         <button v-if="isSearchMode" class="btn btn-outline-secondary" @click="clearSearch" title="Clear search">✕</button>
                     </div>
                 </div>
                 <!-- Rows per page (hidden while searching) -->
                 <div v-if="!isSearchMode" class="col-auto">
-                    <label class="col-form-label text-muted small">Rows per page:</label>
+                    <label class="col-form-label text-muted small">редове:</label>
                 </div>
                 <div v-if="!isSearchMode" class="col-auto">
                     <select class="form-select form-select-sm" v-model.number="pageSize" @change="onPageSizeChange">
@@ -64,7 +64,7 @@
                 </div>
                 <div class="col-auto">
                     <button v-if="!isSearchMode" class="btn btn-sm btn-outline-primary" @click="fetchEntries" :disabled="loading">
-                        ↻ Refresh
+                        ↻ обнови
                     </button>
                 </div>
             </div>
@@ -74,18 +74,18 @@
     <!-- Table card -->
     <div class="card shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <span v-if="isSearchMode">Search results for <em>"{{ activeSearch }}"</em></span>
-            <span v-else>Entries</span>
+            <span v-if="isSearchMode">резултати за <em>"{{ activeSearch }}"</em></span>
+            <span v-else>списък</span>
             <small class="text-secondary">
-                <span v-if="isSearchMode">{{ entries.length }} result(s)</span>
-                <span v-else>Page {{ page }} of {{ totalPages || 1 }}</span>
+                <span v-if="isSearchMode">{{ entries.length }} резултат(и)</span>
+                <span v-else>страница {{ page }} от {{ totalPages || 1 }}</span>
             </small>
         </div>
 
         <!-- Loading state -->
         <div v-if="loading" class="spinner-wrapper">
             <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading…</span>
+                <span class="visually-hidden">зарежда…</span>
             </div>
         </div>
 
@@ -94,19 +94,19 @@
             <table class="table table-hover table-sm align-middle mb-0">
                 <thead>
                     <tr>
-                        <th style="width:80px">#&nbsp;genre</th>
-                        <th>name</th>
-                        <th class="hash-col">hash</th>
-                        <th style="width:80px" class="text-center">files</th>
-                        <th style="width:80px" class="text-center">size</th>
-                        <th style="width:180px">found</th>
-                        <th style="width:80px" class="text-center">link</th>
-                        <th style="width:60px" class="text-center">del</th>
+                        <th style="width:80px">#&nbsp;жанр</th>
+                        <th>име</th>
+                        <th class="hash-col">хеш</th>
+                        <th style="width:80px" class="text-center">файлове</th>
+                        <th style="width:80px" class="text-center">размер</th>
+                        <th style="width:100px">намерен</th>
+                        <th style="width:80px" class="text-center"></th>
+                        <th style="width:60px" class="text-center"></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-if="entries.length === 0">
-                        <td colspan="8" class="text-center text-muted py-5">No entries found.</td>
+                        <td colspan="8" class="text-center text-muted py-5">няма нищо.</td>
                     </tr>
                     <tr v-for="e in entries" :key="e.id">
                         <td class="text-center">{{ e.genre }}</td>
@@ -307,7 +307,7 @@
 			},
 			
             entryLink(e) {
-                return `magnet:?xt=urn:btih:${e.hash}&dn=${e.name}&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce`;
+                return `magnet:?xt=urn:btih:${e.hash}&dn=${e.name}`;
             },
 
             async deleteEntry(hash) {
