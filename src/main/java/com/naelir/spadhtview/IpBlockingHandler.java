@@ -28,6 +28,7 @@ public class IpBlockingHandler extends Handler.Wrapper {
     public boolean handle(Request request, Response response, Callback callback) throws Exception {
         String remoteIp = Request.getRemoteAddr(request);
         System.out.println("Remote IP: " + remoteIp);
+        System.out.println(request.getHeaders().asString());
 //        if (!isAllowed(remoteIp)) {
 //            response.setStatus(403);
 //            byte[] body = "Forbidden".getBytes(StandardCharsets.UTF_8);
