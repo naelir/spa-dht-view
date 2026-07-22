@@ -1,22 +1,19 @@
 package com.naelir.spadhtview;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Path("/api/entries")
 @Produces(MediaType.APPLICATION_JSON)
@@ -82,7 +79,7 @@ public class EntryResource {
      * POST /api/entries
      * Creates a new entry. Returns 201 Created with the stored entity.
      */
-    @POST
+//    @POST
     public Response create(Entry entry) {
         Entry created = repo.insert(entry);
         return Response.status(Response.Status.CREATED).entity(created).build();
@@ -93,8 +90,8 @@ public class EntryResource {
      * Creates multiple entries in one request.
      * Returns 201 Created with the list of stored entities.
      */
-    @POST
-    @Path("/batch")
+//    @POST
+//    @Path("/batch")
     public Response createBatch(List<Entry> entries) {
         if (entries == null || entries.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -109,8 +106,8 @@ public class EntryResource {
      * PUT /api/entries/{hash}
      * Replaces an existing entry. Returns 200 on success, 404 if not found.
      */
-    @PUT
-    @Path("/{hash}")
+//    @PUT
+//    @Path("/{hash}")
     public Response update(@PathParam("hash") String hash, Entry entry) {
         entry.hash = hash;
         boolean updated = repo.update(entry);
@@ -125,8 +122,8 @@ public class EntryResource {
      * Removes an existing entry by its info-hash.
      * Returns 204 No Content on success, 404 if not found.
      */
-    @DELETE
-    @Path("/{hash}")
+//    @DELETE
+//    @Path("/{hash}")
     public Response delete(@PathParam("hash") String hash) {
         boolean removed = repo.remove(hash);
         if (!removed) {
