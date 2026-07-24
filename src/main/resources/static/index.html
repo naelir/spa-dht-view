@@ -9,10 +9,32 @@
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
           crossorigin="anonymous" />
     <style>
+        :root {
+            --theme: rgb(86, 123, 155);
+            --theme-dark: rgb(55, 97, 133);
+            --bs-dark: rgb(72, 123, 168);
+            --bs-dark-rgb: 72, 123, 168;
+        }
         body { background: #f4f6f8; }
-        .card-header { background: #212529; color: #fff; }
+        .card-header { background: var(--theme); color: #fff; }
         .hash-col { font-family: "Courier New", monospace; font-size: .8rem; word-break: break-all; }
-        .page-link { cursor: pointer; }
+        /* Pagination */
+        .page-link { cursor: pointer; color: var(--theme); }
+        .page-link:hover { color: var(--theme-dark); background-color: #e2e6ea; border-color: #dee2e6; }
+        .page-item.active .page-link { background-color: var(--theme); border-color: var(--theme); color: #fff; }
+        .page-item.active .page-link:hover { background-color: var(--theme-dark); border-color: var(--theme-dark); }
+        /* Links */
+        a { color: var(--theme); }
+        a:hover { color: var(--theme-dark); }
+        /* btn-dark overrides */
+        .btn-dark { background-color: var(--theme); border-color: var(--theme); color: #fff; }
+        .btn-dark:hover, .btn-dark:focus { background-color: var(--theme-dark); border-color: var(--theme-dark); color: #fff; }
+        .btn-dark:disabled { background-color: var(--theme); border-color: var(--theme); opacity: .65; }
+        /* btn-outline-dark overrides */
+        .btn-outline-dark { color: var(--theme); border-color: var(--theme); }
+        .btn-outline-dark:hover { background-color: var(--theme); border-color: var(--theme); color: #fff; }
+        /* spinner */
+        .text-dark { color: var(--theme) !important; }
         thead th { user-select: none; white-space: nowrap; }
         .spinner-wrapper { min-height: 200px; display: flex; align-items: center; justify-content: center; }
     </style>
@@ -46,7 +68,7 @@
                                v-model.trim="searchQuery"
                                @keyup.enter="onSearch"
                                @input="onSearchInput" />
-                        <button class="btn btn-primary" @click="onSearch" :disabled="loading">потърси</button>
+                        <button class="btn btn-dark" @click="onSearch" :disabled="loading">потърси</button>
                         <button v-if="isSearchMode" class="btn btn-outline-secondary" @click="clearSearch" title="Clear search">✕</button>
                     </div>
                 </div>
@@ -63,7 +85,7 @@
                     </select>
                 </div>
                 <div class="col-auto">
-                    <button v-if="!isSearchMode" class="btn btn-sm btn-outline-primary" @click="fetchEntries" :disabled="loading">
+                    <button v-if="!isSearchMode" class="btn btn-sm btn-outline-dark" @click="fetchEntries" :disabled="loading">
                         ↻ обнови
                     </button>
                 </div>
@@ -76,7 +98,7 @@
         <div class="card-header d-flex justify-content-between align-items-center">
             <span v-if="isSearchMode">резултати за <em>"{{ activeSearch }}"</em></span>
             <span v-else>списък</span>
-            <small class="text-secondary">
+            <small>
                 <span v-if="isSearchMode">{{ entries.length }} резултат(и)</span>
                 <span v-else>страница {{ page }} от {{ totalPages || 1 }}</span>
             </small>
@@ -84,7 +106,7 @@
 
         <!-- Loading state -->
         <div v-if="loading" class="spinner-wrapper">
-            <div class="spinner-border text-primary" role="status">
+            <div class="spinner-border text-dark" role="status">
                 <span class="visually-hidden">зарежда…</span>
             </div>
         </div>
@@ -115,14 +137,14 @@
                         <td class="text-center">{{ e.fileCount }}</td>
                         <td class="text-center">{{ formatBytes(e.size) }}</td>
                         <td class="small">{{ formatDate(e.foundTime) }}</td>
-<!--                         <td class="text-center"> -->
-<!--                             <a :href="entryLink(e)">-</a> -->
-<!--                         </td> -->
-<!--                         <td class="text-center"> -->
-<!--                             <button class="btn btn-danger btn-sm py-0 px-1" -->
-<!--                                     title="Delete" -->
-<!--                                     @click="deleteEntry(e.hash)">🗑</button> -->
-<!--                         </td> -->
+                        <td class="text-center">
+                            <a :href="entryLink(e)">-</a>
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-dark btn-sm py-0 px-1"
+                                    title="Delete"
+                                    @click="deleteEntry(e.hash)">🗑</button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
