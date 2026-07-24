@@ -137,13 +137,13 @@
                         <td class="text-center">{{ e.fileCount }}</td>
                         <td class="text-center">{{ formatBytes(e.size) }}</td>
                         <td class="small">{{ formatDate(e.foundTime) }}</td>
-                        <td class="text-center">
-                            <a :href="entryLink(e)">-</a>
-                        </td>
-                        <td class="text-center">
-                            <button class="btn btn-dark btn-sm py-0 px-1"
-                                    title="Delete"
-                                    @click="deleteEntry(e.hash)">🗑</button>
+<!--                         <td class="text-center"> -->
+<!--                             <a :href="entryLink(e)">-</a> -->
+<!--                         </td> -->
+<!--                         <td class="text-center"> -->
+<!--                             <button class="btn btn-dark btn-sm py-0 px-1" -->
+<!--                                     title="Delete" -->
+<!--                                     @click="deleteEntry(e.hash)">🗑</button> -->
                         </td>
                     </tr>
                 </tbody>
