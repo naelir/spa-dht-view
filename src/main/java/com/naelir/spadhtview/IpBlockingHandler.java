@@ -1,7 +1,10 @@
 package com.naelir.spadhtview;
 
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
@@ -20,22 +23,28 @@ import org.eclipse.jetty.util.Callback;
  */
 public class IpBlockingHandler extends Handler.Wrapper {
 
-    public IpBlockingHandler(Handler wrapped) {
-        super(wrapped);
-    }
-
     @Override
     public boolean handle(Request request, Response response, Callback callback) throws Exception {
-        String remoteIp = Request.getRemoteAddr(request);
-        System.out.println("Remote IP: " + remoteIp);
-        System.out.println(request.getHeaders().asString());
-//        if (!isAllowed(remoteIp)) {
-//            response.setStatus(403);
-//            byte[] body = "Forbidden".getBytes(StandardCharsets.UTF_8);
-//            response.write(true, ByteBuffer.wrap(body), callback);
-//            return true;
-//        }
+        String remoteIp = resolveIp(request);
+        if (!isAllowed(remoteIp)) {
+            response.setStatus(403);
+            byte[] body = "Forbidden".getBytes(StandardCharsets.UTF_8);
+            response.write(true, ByteBuffer.wrap(body), callback);
+            return true;
+        }
         return super.handle(request, response, callback);
+    }
+
+    private static String resolveIp(Request request) {
+        String xff = request.getHeaders().get("X-Forwarded-For");
+        if (xff != null && !xff.isBlank()) {
+            return xff.split(",")[0].trim();
+        }
+        String xri = request.getHeaders().get("X-Real-IP");
+        if (xri != null && !xri.isBlank()) {
+            return xri.trim();
+        }
+        return Request.getRemoteAddr(request);
     }
 
     private static boolean isAllowed(String ip) {
@@ -43,8 +52,12 @@ public class IpBlockingHandler extends Handler.Wrapper {
             return false;
         }
         try {
-            byte[] bytes = InetAddress.getByName(ip).getAddress();
-            return IpRangeFilter.isAllowed(bytes);
+            InetAddress addr = InetAddress.getByName(ip);
+            if (addr instanceof Inet6Address) {
+                // Range files are IPv4-only; block all native IPv6 connections.
+                return false;
+            }
+            return IpRangeFilter.isAllowed(addr.getAddress());
         } catch (UnknownHostException e) {
             return false;
         }

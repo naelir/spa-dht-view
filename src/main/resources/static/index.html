@@ -123,7 +123,7 @@
                         <th style="width:80px" class="text-center">размер</th>
                         <th style="width:100px">намерен</th>
 <!--                         <th style="width:80px" class="text-center"></th> -->
-                        <th style="width:60px" class="text-center"></th>
+                        <th style="width:60px" class="text-center" v-if="isAdmin"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -140,7 +140,7 @@
 <!--                         <td class="text-center"> -->
 <!--                             <a :href="entryLink(e)">-</a> -->
 <!--                         </td> -->
-                        <td class="text-center">
+                        <td class="text-center" v-if="isAdmin">
                             <button class="btn btn-dark btn-sm py-0 px-1"
                                     title="Delete"
                                     @click="deleteEntry(e.hash)">🗑</button>
@@ -214,7 +214,8 @@
                 error:        null,
                 searchQuery:  '',
                 activeSearch: '',
-                isSearchMode: false
+                isSearchMode: false,
+                isAdmin:      false
             };
         },
 
@@ -332,10 +333,22 @@
                 return `magnet:?xt=urn:btih:${e.hash}&dn=${e.name}`;
             },
 
+            async checkAdmin() {
+                const token = new URLSearchParams(window.location.search).get('admin');
+                if (!token) return;
+                try {
+                    const { data } = await axios.get('/api/admin', { params: { token } });
+                    this.isAdmin = !!data.admin;
+                } catch {
+                    this.isAdmin = false;
+                }
+            },
+
             async deleteEntry(hash) {
                 if (!hash) return;
+                const token = new URLSearchParams(window.location.search).get('admin');
                 try {
-                    await axios.delete(`/api/entries/${hash}`);
+                    await axios.delete(`/api/entries/${hash}`, { params: { token } });
                     if (this.isSearchMode) {
                         this.searchEntries();
                     } else {
@@ -349,6 +362,7 @@
         },
 
         mounted() {
+            this.checkAdmin();
             this.fetchEntries();
         }
     }).mount('#app');

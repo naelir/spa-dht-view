@@ -125,7 +125,11 @@ public class EntryResource {
      */
     @DELETE
     @Path("/{hash}")
-    public Response delete(@PathParam("hash") String hash) {
+    public Response delete(@PathParam("hash") String hash,
+                           @QueryParam("token") String token) {
+        if (!AdminResource.isValidToken(token)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
         boolean removed = repo.remove(hash);
         if (!removed) {
             return Response.status(Response.Status.NOT_FOUND).build();

@@ -30,6 +30,7 @@ public class JerseyConfig extends ResourceConfig {
         // JAX-RS resources
         register(IndexResource.class);
         register(EntryResource.class);
+        register(AdminResource.class);
 
         // Jackson JSON (de)serialization
         register(JacksonFeature.class);
