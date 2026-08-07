@@ -121,7 +121,7 @@
                         <th class="hash-col">хеш</th>
                         <th style="width:80px" class="text-center">файлове</th>
                         <th style="width:80px" class="text-center">размер</th>
-                        <th style="width:100px">намерен</th>
+                        <th style="width:100px">активен</th>
 <!--                         <th style="width:80px" class="text-center"></th> -->
                         <th style="width:60px" class="text-center" v-if="isAdmin"></th>
                     </tr>
@@ -131,19 +131,19 @@
                         <td colspan="8" class="text-center text-muted py-5">няма нищо.</td>
                     </tr>
                     <tr v-for="e in entries" :key="e.id">
-                        <td class="text-center">{{ e.genre }}</td>
-                        <td>{{ e.name || '—' }}</td>
-                        <td class="hash-col text-secondary">{{ e.hash || '—' }}</td>
-                        <td class="text-center">{{ e.fileCount }}</td>
-                        <td class="text-center">{{ formatBytes(e.size) }}</td>
-                        <td class="small">{{ formatDate(e.foundTime) }}</td>
+                        <td class="text-center">{{ e.g }}</td>
+                        <td>{{ e.n || '—' }}</td>
+                        <td class="hash-col text-secondary">{{ e.h || '—' }}</td>
+                        <td class="text-center">{{ e.fc }}</td>
+                        <td class="text-center">{{ formatBytes(e.sz) }}</td>
+                        <td class="small">{{ formatDate(e.se) }}</td>
 <!--                         <td class="text-center"> -->
 <!--                             <a :href="entryLink(e)">-</a> -->
 <!--                         </td> -->
                         <td class="text-center" v-if="isAdmin">
                             <button class="btn btn-dark btn-sm py-0 px-1"
                                     title="Delete"
-                                    @click="deleteEntry(e.hash)">🗑</button>
+                                    @click="deleteEntry(e.h)">🗑</button>
                         </td>
                     </tr>
                 </tbody>
@@ -316,7 +316,7 @@
 			  const units = ["B", "KB", "MB", "GB", "TB", "PB", "EB"];
 			
 			  if (bytes === 0 || bytes < 0) {
-			    return "0.00B";
+			    return "NA";
 			  }
 			
 			  const index = Math.min(
@@ -330,7 +330,7 @@
 			},
 			
             entryLink(e) {
-                return `magnet:?xt=urn:btih:${e.hash}&dn=${e.name}`;
+                return `magnet:?xt=urn:btih:${e.h}&dn=${e.n}`;
             },
 
             async checkAdmin() {

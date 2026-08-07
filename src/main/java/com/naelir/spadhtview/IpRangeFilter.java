@@ -92,7 +92,7 @@ public class IpRangeFilter {
                 list.add(new IpRange(split[0], split[1], country));
             }
         } catch (Exception e) {
-            System.err.println("Failed to read IP range file: {}" + e.getMessage());
+            System.err.println("Failed to read IP range file");
         }
         return list;
     }

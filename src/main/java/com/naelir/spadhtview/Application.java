@@ -46,7 +46,7 @@ public class Application {
             String mongoUri = System.getProperty("DATABASE_URL", "mongodb://localhost:27017");
             String mongoDb  = System.getProperty("DATABASE_NAME", "dht_view");
             String table  = System.getProperty("MAIN_TABLE", "hashes");
-            System.out.printf("Using MongoEntryRepository  uri=%s  db=%s%n", mongoUri, mongoDb);
+            System.out.printf("Using MongoEntryRepository  uri=%s  db=%s%n%s", mongoUri, mongoDb, table);
             repo = new MongoEntryRepository(mongoUri, mongoDb, table);
         }
 
@@ -70,7 +70,7 @@ public class Application {
         server.setHandler(ipBlockingHandler);
         ipBlockingHandler.setHandler(context);
         server.start();
-        System.out.printf("DHT View started on http://localhost:%d/%n", port);
+        System.out.printf("DHT View started on %d/%n", port);
         server.join();
     }
 
