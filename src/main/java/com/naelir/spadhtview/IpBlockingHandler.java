@@ -1,10 +1,11 @@
 package com.naelir.spadhtview;
 
-import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Logger;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
@@ -23,14 +24,27 @@ import org.eclipse.jetty.util.Callback;
  */
 public class IpBlockingHandler extends Handler.Wrapper {
 
+    private static final Logger LOG = Logger.getLogger(IpBlockingHandler.class.getName());
+    private static final long LOG_INTERVAL = 100;
+    private final AtomicLong blockedCount = new AtomicLong(0);
+    private final AtomicLong allowedCount = new AtomicLong(0);
+
     @Override
     public boolean handle(Request request, Response response, Callback callback) throws Exception {
         String remoteIp = resolveIp(request);
         if (!isAllowed(remoteIp)) {
+            long count = blockedCount.incrementAndGet();
+            if (count % LOG_INTERVAL == 0) {
+                LOG.warning("Blocked requests count: " + count);
+            }
             response.setStatus(403);
             byte[] body = "Forbidden".getBytes(StandardCharsets.UTF_8);
             response.write(true, ByteBuffer.wrap(body), callback);
             return true;
+        }
+        long count = allowedCount.incrementAndGet();
+        if (count % LOG_INTERVAL == 0) {
+            LOG.info("Allowed requests count: " + count);
         }
         return super.handle(request, response, callback);
     }
@@ -53,9 +67,9 @@ public class IpBlockingHandler extends Handler.Wrapper {
         }
         try {
             InetAddress addr = InetAddress.getByName(ip);
-            if (addr instanceof Inet6Address) {
-                // Range files are IPv4-only; block all native IPv6 connections.
-                return false;
+
+            if (addr.isLoopbackAddress() || addr.isAnyLocalAddress()) {
+                return true; // allow localhost
             }
             return IpRangeFilter.isAllowed(addr.getAddress());
         } catch (UnknownHostException e) {

@@ -18,27 +18,16 @@ public class InMemoryEntryRepository implements EntryRepository {
 
 
     @Override
-    public List<Entry> findAll(int page, int pageSize) {
-        int skip = Math.max(0, (page - 1) * pageSize);
+    public List<Entry> getLast() {
         return store.stream()
                 .sorted(Comparator.comparingLong((Entry e) -> e.foundTime).reversed())
-                .skip(skip)
-                .limit(pageSize)
+                .limit(50)
                 .toList();
     }
 
     @Override
     public long count() {
         return store.size();
-    }
-
-    @Override
-    public Entry findByHash(String hash) {
-        if (hash == null) return null;
-        return store.stream()
-                .filter(e -> hash.equals(e.hash))
-                .findFirst()
-                .orElse(null);
     }
 
     @Override
@@ -60,23 +49,8 @@ public class InMemoryEntryRepository implements EntryRepository {
 
     @Override
     public synchronized Entry insert(Entry entry) {
-        // duplicate hash – skip silently
-        if (findByHash(entry.hash) != null) {
-            return entry;
-        }
         store.add(copy(entry));
         return entry;
-    }
-
-    @Override
-    public synchronized boolean update(Entry entry) {
-        for (int i = 0; i < store.size(); i++) {
-            if (entry.hash != null && entry.hash.equals(store.get(i).hash)) {
-                store.set(i, copy(entry));
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
