@@ -1,0 +1,29 @@
+/**
+ * Bulgarian (bg) localization strings.
+ * To swap language, replace this file or swap the <script> reference in index.html.
+ */
+const LOCALE = {
+    total:              'общо',
+    searchPlaceholder:  'потърси по име…',
+    searchButton:       'потърси',
+    rowsLabel:          'редове:',
+    refreshButton:      '↻ обнови',
+    searchResultsFor:   'резултати за',
+    listHeader:         'списък',
+    pageOf:             'страница {page} от {total}',
+    resultCount:        'резултат(и)',
+    loading:            'зарежда…',
+    noData:             'няма нищо.',
+    showing:            'Показва',
+    of:                 'от',
+    deleteTitle:        'Изтрий',
+    deleteFailed:       'Неуспешно изтриване: ',
+    loadFailed:         'Грешка при зареждане: ',
+    searchFailed:       'Търсенето неуспешно: ',
+    colGenre:           '# жанр',
+    colName:            'име',
+    colHash:            'хеш',
+    colFiles:           'файлове',
+    colSize:            'размер',
+    colActive:          'активен',
+};

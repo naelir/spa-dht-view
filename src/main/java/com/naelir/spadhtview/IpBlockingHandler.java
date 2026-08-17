@@ -1,6 +1,5 @@
 package com.naelir.spadhtview;
 
-import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -53,9 +52,9 @@ public class IpBlockingHandler extends Handler.Wrapper {
         }
         try {
             InetAddress addr = InetAddress.getByName(ip);
-            if (addr instanceof Inet6Address) {
-                // Range files are IPv4-only; block all native IPv6 connections.
-                return false;
+
+            if (addr.isLoopbackAddress() || addr.isAnyLocalAddress()) {
+                return true; // allow localhost
             }
             return IpRangeFilter.isAllowed(addr.getAddress());
         } catch (UnknownHostException e) {

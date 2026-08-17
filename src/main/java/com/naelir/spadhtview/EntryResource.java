@@ -31,7 +31,12 @@ public class EntryResource {
     @GET
     public Response list(
             @QueryParam("page")     @DefaultValue("1")  int page,
-            @QueryParam("pageSize") @DefaultValue("20") int pageSize) {
+            @QueryParam("pageSize") @DefaultValue("20") int pageSize,
+            @QueryParam("token") String token) {
+
+        if (!TokenValidator.isValidReadToken(token)) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
 
         List<Entry> entries = repo.findAll(page, pageSize);
         long total = repo.count();
@@ -52,7 +57,11 @@ public class EntryResource {
      */
     @GET
     @Path("/search")
-    public Response searchByName(@QueryParam("name") String name) {
+    public Response searchByName(@QueryParam("name") String name,
+                                 @QueryParam("token") String token) {
+        if (!TokenValidator.isValidReadToken(token)) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
         if (name == null || name.isBlank()) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("Query parameter 'name' is required")
@@ -68,51 +77,13 @@ public class EntryResource {
      */
     @GET
     @Path("/{hash}")
-    public Response getByHash(@PathParam("hash") String hash) {
+    public Response getByHash(@PathParam("hash") String hash,
+                              @QueryParam("token") String token) {
+        if (!TokenValidator.isValidReadToken(token)) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
         Entry entry = repo.findByHash(hash);
         if (entry == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        return Response.ok(entry).build();
-    }
-
-    /**
-     * POST /api/entries
-     * Creates a new entry. Returns 201 Created with the stored entity.
-     */
-//    @POST
-    public Response create(Entry entry) {
-        Entry created = repo.insert(entry);
-        return Response.status(Response.Status.CREATED).entity(created).build();
-    }
-
-    /**
-     * POST /api/entries/batch
-     * Creates multiple entries in one request.
-     * Returns 201 Created with the list of stored entities.
-     */
-//    @POST
-//    @Path("/batch")
-    public Response createBatch(List<Entry> entries) {
-        if (entries == null || entries.isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Request body must be a non-empty JSON array")
-                    .build();
-        }
-        entries.forEach(repo::insert);
-        return Response.status(Response.Status.CREATED).build();
-    }
-
-    /**
-     * PUT /api/entries/{hash}
-     * Replaces an existing entry. Returns 200 on success, 404 if not found.
-     */
-//    @PUT
-//    @Path("/{hash}")
-    public Response update(@PathParam("hash") String hash, Entry entry) {
-        entry.hash = hash;
-        boolean updated = repo.update(entry);
-        if (!updated) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         return Response.ok(entry).build();

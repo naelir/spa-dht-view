@@ -32,6 +32,8 @@ public class MongoEntryRepository implements EntryRepository {
     private void ensureIndexes() {
         collection.createIndex(Indexes.ascending("h"), new IndexOptions().unique(true));
         collection.createIndex(Indexes.ascending("n"));
+        collection.createIndex(Indexes.descending("p"));
+
     }
 
     // ...existing code...
@@ -50,7 +52,7 @@ public class MongoEntryRepository implements EntryRepository {
         Pattern regex = Pattern.compile(sb.toString(), Pattern.CASE_INSENSITIVE);
         List<Entry> results = new ArrayList<>();
         collection.find(Filters.regex("n", regex))
-                .sort(Sorts.descending("_id"))
+                .sort(Sorts.descending("p"))
                 .limit(200)
                 .forEach(doc -> results.add(fromDocument(doc)));
         return results;
@@ -117,6 +119,7 @@ public class MongoEntryRepository implements EntryRepository {
                 .append("g", e.genre)
                 .append("fc", e.fileCount)
                 .append("se", e.foundTime)
+                .append("p", e.peers)
                 .append("sz", e.size);
     }
 
@@ -127,6 +130,8 @@ public class MongoEntryRepository implements EntryRepository {
         e.genre      = doc.getString("g");
         Integer fc  = doc.getInteger("fc");
         e.fileCount = fc != null ? fc : 0;
+        Integer p  = doc.getInteger("p");
+        e.peers = p != null ? p : 0;
         e.foundTime = toLong(doc.get("se"));
         e.size       = toLong(doc.get("sz"));
         return e;

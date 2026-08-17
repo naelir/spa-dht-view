@@ -1,5 +1,6 @@
 package com.naelir.spadhtview;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.server.Server;
@@ -18,6 +19,10 @@ import org.glassfish.jersey.servlet.ServletContainer;
  *   <li>{@code repo}         – repository type: {@code memory} or {@code mongo} (default mongo)</li>
  *   <li>{@code mongo.uri}    – MongoDB connection string (default mongodb://localhost:27017)</li>
  *   <li>{@code mongo.db}     – MongoDB database name (default dhtview)</li>
+ *   <li>{@code rate.limit}   – max API requests per minute per IP (default 60)</li>
+ *   <li>{@code rate.limit.window} – rate-limit window in ms (default 60 000)</li>
+ *   <li>{@code server.origin} – expected Origin header, e.g. {@code https://myapp.example.com};
+ *       when omitted the server derives it from the incoming request's own host.</li>
  * </ul>
  */
 public class Application {
@@ -31,17 +36,18 @@ public class Application {
             System.out.println("Using InMemoryEntryRepository");
             repo = new InMemoryEntryRepository();
             long now = System.currentTimeMillis();
-            Object[][] dummyData = dummyData(now);
-            for (Object[] row : dummyData) {
+            for (int i = 0; i < 100; i++) {
+
                 Entry e = new Entry();
-                e.name      = (String) row[0];
-                e.hash      = (String) row[1];
-                e.fileCount = (int)    row[2];
-                e.foundTime = (long)   row[3];
-                e.size      = (long)   row[4];
-                e.genre     = (String) row[5];
+                e.name      = RandomStringUtils.randomAlphanumeric(70);
+                e.hash      = RandomStringUtils.randomAlphanumeric(40);
+                e.fileCount = 1;
+                e.foundTime = 0;
+                e.size      = 2300000000L;
+                e.genre     = "OOO";
                 repo.insert(e);
             }
+            
         } else {
             String mongoUri = System.getProperty("DATABASE_URL", "mongodb://localhost:27017");
             String mongoDb  = System.getProperty("DATABASE_NAME", "dht_view");
@@ -72,21 +78,5 @@ public class Application {
         server.start();
         System.out.printf("DHT View started on %d/%n", port);
         server.join();
-    }
-
-    static Object[][] dummyData(long now) {
-        Object[][] dummyData = {
-            { "a",   "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2", 2,  now - 86400000L * 1,  2_500_000_000L, "movie"        },
-            { "b", "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3", 6,  now - 86400000L * 2,  48_000_000_000L,"documentary"  },
-            { "c",          "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4", 1,  now - 86400000L * 3,  2_000_000_000L, "software"     },
-            { "d",          "d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5", 1,  now - 86400000L * 4,  18_000_000_000L,"movie"        },
-            { "e",      "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6", 37, now - 86400000L * 5,  50_000_000L,    "ebook"        },
-            { "f", "f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1", 3,  now - 86400000L * 6,  8_700_000_000L, "movie"        },
-            { "g",             "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6b2c3", 1,  now - 86400000L * 7,  5_000_000L,     "ebook"        },
-            { "h",   "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6c3d4e5", 13, now - 86400000L * 8,  22_000_000_000L,"documentary"  },
-            { "i",     "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6d4e5f6a1", 1,  now - 86400000L * 9,  40_000_000L,    "software"     },
-            { "j",        "d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6e5f6a1b2c3", 1,  now - 86400000L * 10, 55_000_000_000L,"movie"        },
-        };
-        return dummyData;
     }
 }

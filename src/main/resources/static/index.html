@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
+    <meta name="robots" content="noindex, noarchive, nocache" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>___</title>
+    <style>[v-cloak]{display:none!important}</style>
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
@@ -15,8 +17,7 @@
             --bs-dark: rgb(72, 123, 168);
             --bs-dark-rgb: 72, 123, 168;
         }
-        body { background: #f4f6f8; }
-        .card-header { background: var(--theme); color: #fff; }
+        .card-header { background: #2e3d50; color: #fff; }
         .hash-col { font-family: "Courier New", monospace; font-size: .8rem; word-break: break-all; }
         /* Pagination */
         .page-link { cursor: pointer; color: var(--theme); }
@@ -37,15 +38,41 @@
         .text-dark { color: var(--theme) !important; }
         thead th { user-select: none; white-space: nowrap; }
         .spinner-wrapper { min-height: 200px; display: flex; align-items: center; justify-content: center; }
+        body { background-color: #111d27; color: #f0f4f8; }
+        /* Dark theme – cards */
+        .card { background-color: #1a2535; border-color: #2e3d50; color: #f0f4f8; }
+        .card-footer { background-color: #161f2e; border-color: #2e3d50; color: #e0e8f0; }
+        /* Dark theme – table */
+        .table { color: #f0f4f8; --bs-table-bg: #1a2535; --bs-table-striped-bg: #1e2c3e;
+                 --bs-table-hover-bg: #243347; --bs-table-border-color: #2e3d50; }
+        .table thead th { background-color: #0f1923; color: #c8d8e8; border-color: #2e3d50; }
+        .table td, .table th { border-color: #2e3d50; color: #f0f4f8; }
+        .text-muted { color: #a0b4c8 !important; }
+        .text-secondary { color: #b0c4d8 !important; }
+        /* Dark theme – inputs / selects */
+        .form-control, .form-select, .input-group-text {
+            background-color: #0f1923; color: #f0f4f8; border-color: #2e3d50; }
+        .form-control::placeholder { color: #7a90a8; }
+        .form-control:focus, .form-select:focus {
+            background-color: #0f1923; color: #f0f4f8;
+            border-color: var(--theme); box-shadow: 0 0 0 .2rem rgba(86,123,155,.25); }
+        /* Dark theme – pagination */
+        .page-link { background-color: #1a2535; border-color: #2e3d50; color: #c8d8e8; }
+        .page-link:hover { background-color: #243347; border-color: #2e3d50; color: #ffffff; }
+        .page-item.disabled .page-link { background-color: #161f2e; border-color: #2e3d50; color: #4a5f74; }
+        /* Badge */
+        .badge.bg-secondary { background-color: #2e3d50 !important; color: #f0f4f8 !important; }
+        /* Hide app until Vue has mounted to prevent flash of un-rendered template */
+        [v-cloak] { display: none !important; }
     </style>
 </head>
 <body>
-<div id="app" class="container-lg py-4">
+<div id="app" v-cloak class="container-lg py-4">
 
     <!-- Header -->
     <div class="d-flex align-items-center mb-4 gap-3">
         <h2 class="mb-0">🔍 ___</h2>
-        <span v-if="!loading" class="badge bg-secondary fs-6">{{ total.toLocaleString() }} общо</span>
+        <span v-if="!loading" class="badge bg-secondary fs-6">{{ total.toLocaleString() }} {{ t.total }}</span>
     </div>
 
     <!-- Error banner -->
@@ -64,17 +91,17 @@
                         <span class="input-group-text">🔎</span>
                         <input type="text"
                                class="form-control"
-                               placeholder="потърси по име…"
+                               :placeholder="t.searchPlaceholder"
                                v-model.trim="searchQuery"
                                @keyup.enter="onSearch"
                                @input="onSearchInput" />
-                        <button class="btn btn-dark" @click="onSearch" :disabled="loading">потърси</button>
+                        <button class="btn btn-dark" @click="onSearch" :disabled="loading">{{ t.searchButton }}</button>
                         <button v-if="isSearchMode" class="btn btn-outline-secondary" @click="clearSearch" title="Clear search">✕</button>
                     </div>
                 </div>
                 <!-- Rows per page (hidden while searching) -->
                 <div v-if="!isSearchMode" class="col-auto">
-                    <label class="col-form-label text-muted small">редове:</label>
+                    <label class="col-form-label text-muted small">{{ t.rowsLabel }}</label>
                 </div>
                 <div v-if="!isSearchMode" class="col-auto">
                     <select class="form-select form-select-sm" v-model.number="pageSize" @change="onPageSizeChange">
@@ -86,7 +113,7 @@
                 </div>
                 <div class="col-auto">
                     <button v-if="!isSearchMode" class="btn btn-sm btn-outline-dark" @click="fetchEntries" :disabled="loading">
-                        ↻ обнови
+                        {{ t.refreshButton }}
                     </button>
                 </div>
             </div>
@@ -96,18 +123,53 @@
     <!-- Table card -->
     <div class="card shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <span v-if="isSearchMode">резултати за <em>"{{ activeSearch }}"</em></span>
-            <span v-else>списък</span>
+            <span v-if="isSearchMode">{{ t.searchResultsFor }} <em>"{{ activeSearch }}"</em></span>
+            <span v-else>{{ t.listHeader }}</span>
             <small>
-                <span v-if="isSearchMode">{{ entries.length }} резултат(и)</span>
-                <span v-else>страница {{ page }} от {{ totalPages || 1 }}</span>
+                <span v-if="isSearchMode">{{ entries.length }} {{ t.resultCount }}</span>
+                <span v-else>{{ t.pageOf.replace('{page}', page).replace('{total}', totalPages || 1) }}</span>
             </small>
+        </div>
+
+        <!-- Pagination top (hidden during search) -->
+        <div v-if="!isSearchMode && totalPages > 1" class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <small class="text-muted">
+                {{ t.showing }}
+                {{ entries.length === 0 ? 0 : (page - 1) * pageSize + 1 }}–{{ (page - 1) * pageSize + entries.length }}
+                {{ t.of }} {{ total.toLocaleString() }}
+            </small>
+            <nav aria-label="Table pagination top">
+                <ul class="pagination pagination-sm mb-0 justify-content-center">
+                    <li class="page-item" :class="{ disabled: page <= 1 }">
+                        <span class="page-link" @click="goToPage(1)" title="First">«</span>
+                    </li>
+                    <li class="page-item" :class="{ disabled: page <= 1 }">
+                        <span class="page-link" @click="goToPage(page - 1)">‹</span>
+                    </li>
+                    <li v-if="visiblePages[0] > 1" class="page-item disabled">
+                        <span class="page-link">…</span>
+                    </li>
+                    <li v-for="p in visiblePages" :key="p"
+                        class="page-item" :class="{ active: p === page }">
+                        <span class="page-link" @click="goToPage(p)">{{ p }}</span>
+                    </li>
+                    <li v-if="visiblePages[visiblePages.length - 1] < totalPages" class="page-item disabled">
+                        <span class="page-link">…</span>
+                    </li>
+                    <li class="page-item" :class="{ disabled: page >= totalPages }">
+                        <span class="page-link" @click="goToPage(page + 1)">›</span>
+                    </li>
+                    <li class="page-item" :class="{ disabled: page >= totalPages }">
+                        <span class="page-link" @click="goToPage(totalPages)" title="Last">»</span>
+                    </li>
+                </ul>
+            </nav>
         </div>
 
         <!-- Loading state -->
         <div v-if="loading" class="spinner-wrapper">
             <div class="spinner-border text-dark" role="status">
-                <span class="visually-hidden">зарежда…</span>
+                <span class="visually-hidden">{{ t.loading }}</span>
             </div>
         </div>
 
@@ -116,19 +178,19 @@
             <table class="table table-hover table-sm align-middle mb-0">
                 <thead>
                     <tr>
-                        <th style="width:80px">#&nbsp;жанр</th>
-                        <th>име</th>
-                        <th class="hash-col">хеш</th>
-                        <th style="width:80px" class="text-center">файлове</th>
-                        <th style="width:80px" class="text-center">размер</th>
-                        <th style="width:100px">активен</th>
-<!--                         <th style="width:80px" class="text-center"></th> -->
+                        <th style="width:80px">{{ t.colGenre }}</th>
+                        <th>{{ t.colName }}</th>
+                        <th class="hash-col">{{ t.colHash }}</th>
+                        <th style="width:80px" class="text-center">{{ t.colFiles }}</th>
+                        <th style="width:80px" class="text-center">{{ t.colSize }}</th>
+                        <th style="width:100px">{{ t.colActive }}</th>
+                        <th style="width:10px" class="text-center"></th>
                         <th style="width:60px" class="text-center" v-if="isAdmin"></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-if="entries.length === 0">
-                        <td colspan="8" class="text-center text-muted py-5">няма нищо.</td>
+                        <td colspan="8" class="text-center text-muted py-5">{{ t.noData }}</td>
                     </tr>
                     <tr v-for="e in entries" :key="e.id">
                         <td class="text-center">{{ e.g }}</td>
@@ -137,12 +199,10 @@
                         <td class="text-center">{{ e.fc }}</td>
                         <td class="text-center">{{ formatBytes(e.sz) }}</td>
                         <td class="small">{{ formatDate(e.se) }}</td>
-<!--                         <td class="text-center"> -->
-<!--                             <a :href="entryLink(e)">-</a> -->
-<!--                         </td> -->
+                        <td class="text-center">{{ e.p }}</td>
                         <td class="text-center" v-if="isAdmin">
                             <button class="btn btn-dark btn-sm py-0 px-1"
-                                    title="Delete"
+                                    :title="t.deleteTitle"
                                     @click="deleteEntry(e.h)">🗑</button>
                         </td>
                     </tr>
@@ -150,40 +210,31 @@
             </table>
         </div>
 
-        <!-- Pagination footer (hidden during search) -->
-        <div v-if="!isSearchMode" class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <!-- Pagination bottom (hidden during search) -->
+        <div v-if="!isSearchMode && totalPages > 1" class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
             <small class="text-muted">
-                Showing
+                {{ t.showing }}
                 {{ entries.length === 0 ? 0 : (page - 1) * pageSize + 1 }}–{{ (page - 1) * pageSize + entries.length }}
-                of {{ total.toLocaleString() }}
+                {{ t.of }} {{ total.toLocaleString() }}
             </small>
-            <nav aria-label="Table pagination">
-                <ul class="pagination pagination-sm mb-0">
-                    <!-- First / Prev -->
+            <nav aria-label="Table pagination bottom">
+                <ul class="pagination pagination-sm mb-0 justify-content-center">
                     <li class="page-item" :class="{ disabled: page <= 1 }">
                         <span class="page-link" @click="goToPage(1)" title="First">«</span>
                     </li>
                     <li class="page-item" :class="{ disabled: page <= 1 }">
                         <span class="page-link" @click="goToPage(page - 1)">‹</span>
                     </li>
-
-                    <!-- Ellipsis before -->
                     <li v-if="visiblePages[0] > 1" class="page-item disabled">
                         <span class="page-link">…</span>
                     </li>
-
-                    <!-- Page numbers -->
                     <li v-for="p in visiblePages" :key="p"
                         class="page-item" :class="{ active: p === page }">
                         <span class="page-link" @click="goToPage(p)">{{ p }}</span>
                     </li>
-
-                    <!-- Ellipsis after -->
                     <li v-if="visiblePages[visiblePages.length - 1] < totalPages" class="page-item disabled">
                         <span class="page-link">…</span>
                     </li>
-
-                    <!-- Next / Last -->
                     <li class="page-item" :class="{ disabled: page >= totalPages }">
                         <span class="page-link" @click="goToPage(page + 1)">›</span>
                     </li>
@@ -196,15 +247,28 @@
     </div>
 </div>
 
+<!-- Localization strings -->
+<script src="locale.bg.js"></script>
 <!-- Vue 3 + Axios from CDN (no build step required) -->
 <script src="https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios@1.7.9/dist/axios.min.js"></script>
 <script>
+    function t() {
+        const buf  = new ArrayBuffer(8);
+        const view = new DataView(buf);
+        view.setBigInt64(0, BigInt(Date.now()), false); // big-endian
+        return btoa(String.fromCharCode(...new Uint8Array(buf)))
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_')
+            .replace(/=+$/, '');
+    }
+
     const { createApp } = Vue;
 
     createApp({
         data() {
             return {
+                t:            LOCALE,
                 entries:      [],
                 total:        0,
                 page:         1,
@@ -239,13 +303,13 @@
                 this.error   = null;
                 try {
                     const { data } = await axios.get('/api/entries', {
-                        params: { page: this.page, pageSize: this.pageSize }
+                        params: { page: this.page, pageSize: this.pageSize, token: t() }
                     });
                     this.entries    = data.entries    ?? [];
                     this.total      = data.total      ?? 0;
                     this.totalPages = data.totalPages ?? Math.ceil(this.total / this.pageSize);
                 } catch (err) {
-                    this.error = 'Failed to load entries: ' +
+                    this.error = this.t.loadFailed +
                         (err.response?.data?.message ?? err.message);
                 } finally {
                     this.loading = false;
@@ -257,11 +321,11 @@
                 this.error   = null;
                 try {
                     const { data } = await axios.get('/api/entries/search', {
-                        params: { name: this.activeSearch }
+                        params: { name: this.activeSearch, token: t() }
                     });
                     this.entries = Array.isArray(data) ? data : (data.entries ?? []);
                 } catch (err) {
-                    this.error = 'Search failed: ' +
+                    this.error = this.t.searchFailed +
                         (err.response?.data?.message ?? err.message);
                 } finally {
                     this.loading = false;
@@ -312,7 +376,7 @@
             },
             
             formatBytes(bytes) {
-            
+             
 			  const units = ["B", "KB", "MB", "GB", "TB", "PB", "EB"];
 			
 			  if (bytes === 0 || bytes < 0) {
@@ -355,7 +419,7 @@
                         this.fetchEntries();
                     }
                 } catch (err) {
-                    this.error = 'Delete failed: ' +
+                    this.error = this.t.deleteFailed +
                         (err.response?.data?.message ?? err.message);
                 }
             }

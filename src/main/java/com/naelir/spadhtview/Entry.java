@@ -22,6 +22,9 @@ public class Entry {
 
     @JsonProperty("g")
     public String genre;
+
+    @JsonProperty("p")
+    public Integer peers;
     
     public Entry() {}
 }

@@ -27,8 +27,15 @@ public class JerseyConfig extends ResourceConfig {
         // Basic-Auth guard – runs before any resource is matched
 //        register(AuthFilter.class);
 
+        // Rate-limit: max N requests/minute per IP (set via -Drate.limit and -Drate.limit.window)
+        register(RateLimitFilter.class);
+
+        // Origin/Referer guard: reject requests with no browser Origin header
+        register(OriginFilter.class);
+
         // JAX-RS resources
         register(IndexResource.class);
+        register(StaticResource.class);
         register(EntryResource.class);
         register(AdminResource.class);
 
