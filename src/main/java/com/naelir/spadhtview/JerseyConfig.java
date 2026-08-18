@@ -31,7 +31,7 @@ public class JerseyConfig extends ResourceConfig {
         register(RateLimitFilter.class);
 
         // Origin/Referer guard: reject requests with no browser Origin header
-        register(OriginFilter.class);
+//        register(OriginFilter.class);
 
         // JAX-RS resources
         register(IndexResource.class);
