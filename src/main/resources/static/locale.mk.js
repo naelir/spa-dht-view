@@ -1,0 +1,30 @@
+/**
+ * North Makedonian (mk) localization strings.
+ * To swap language, replace this file or swap the <script> reference in index.html.
+ */
+
+window.LOCALE = {
+    total:              'вкупно',
+    searchPlaceholder:  'пребарај по име…',
+    searchButton:       'пребарај',
+    rowsLabel:          'редови:',
+    refreshButton:      '↻ освежи',
+    searchResultsFor:   'резултати за',
+    listHeader:         'листа',
+    pageOf:             'страница {page} од {total}',
+    resultCount:        'резултат(и)',
+    loading:            'се вчитува…',
+    noData:             'нема податоци.',
+    showing:            'Се прикажуваат',
+    of:                 'од',
+    deleteTitle:        'Избриши',
+    deleteFailed:       'Бришењето не успеа: ',
+    loadFailed:         'Грешка при вчитување: ',
+    searchFailed:       'Пребарувањето не успеа: ',
+    colGenre:           '# жанр',
+    colName:            'име',
+    colHash:            'хеш',
+    colFiles:           'датотеки',
+    colSize:            'големина',
+    colActive:          'активен',
+};

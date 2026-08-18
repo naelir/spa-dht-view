@@ -70,9 +70,20 @@
 <div id="app" v-cloak class="container-lg py-4">
 
     <!-- Header -->
-    <div class="d-flex align-items-center mb-4 gap-3">
+    <div class="d-flex align-items-center mb-4 gap-3 flex-wrap">
         <h2 class="mb-0">🔍 ___</h2>
         <span v-if="!loading" class="badge bg-secondary fs-6">{{ total.toLocaleString() }} {{ t.total }}</span>
+        <div class="ms-auto d-flex gap-2 align-items-center">
+            <button @click="setLocale('bg')" :class="['btn', 'btn-sm', 'p-0', locale === 'bg' ? 'btn-light' : 'btn-outline-secondary']" title="Български" style="border-radius:6px;overflow:hidden;line-height:0;">
+                <img src="https://flagcdn.com/w40/bg.png" width="32" height="22" alt="BG" style="display:block;">
+            </button>
+            <button @click="setLocale('mk')" :class="['btn', 'btn-sm', 'p-0', locale === 'mk' ? 'btn-light' : 'btn-outline-secondary']" title="Македонски" style="border-radius:6px;overflow:hidden;line-height:0;">
+                <img src="https://flagcdn.com/w40/mk.png" width="32" height="22" alt="MK" style="display:block;">
+            </button>
+            <button @click="setLocale('uk')" :class="['btn', 'btn-sm', 'p-0', locale === 'uk' ? 'btn-light' : 'btn-outline-secondary']" title="Українська" style="border-radius:6px;overflow:hidden;line-height:0;">
+                <img src="https://flagcdn.com/w40/ua.png" width="32" height="22" alt="UA" style="display:block;">
+            </button>
+        </div>
     </div>
 
     <!-- Error banner -->
@@ -138,32 +149,32 @@
                 {{ entries.length === 0 ? 0 : (page - 1) * pageSize + 1 }}–{{ (page - 1) * pageSize + entries.length }}
                 {{ t.of }} {{ total.toLocaleString() }}
             </small>
-            <nav aria-label="Table pagination top">
-                <ul class="pagination pagination-sm mb-0 justify-content-center">
-                    <li class="page-item" :class="{ disabled: page <= 1 }">
-                        <span class="page-link" @click="goToPage(1)" title="First">«</span>
-                    </li>
-                    <li class="page-item" :class="{ disabled: page <= 1 }">
-                        <span class="page-link" @click="goToPage(page - 1)">‹</span>
-                    </li>
-                    <li v-if="visiblePages[0] > 1" class="page-item disabled">
-                        <span class="page-link">…</span>
-                    </li>
-                    <li v-for="p in visiblePages" :key="p"
-                        class="page-item" :class="{ active: p === page }">
-                        <span class="page-link" @click="goToPage(p)">{{ p }}</span>
-                    </li>
-                    <li v-if="visiblePages[visiblePages.length - 1] < totalPages" class="page-item disabled">
-                        <span class="page-link">…</span>
-                    </li>
-                    <li class="page-item" :class="{ disabled: page >= totalPages }">
-                        <span class="page-link" @click="goToPage(page + 1)">›</span>
-                    </li>
-                    <li class="page-item" :class="{ disabled: page >= totalPages }">
-                        <span class="page-link" @click="goToPage(totalPages)" title="Last">»</span>
-                    </li>
-                </ul>
-            </nav>
+<!--             <nav aria-label="Table pagination top"> -->
+<!--                 <ul class="pagination pagination-sm mb-0 justify-content-center"> -->
+<!--                     <li class="page-item" :class="{ disabled: page <= 1 }"> -->
+<!--                         <span class="page-link" @click="goToPage(1)" title="First">«</span> -->
+<!--                     </li> -->
+<!--                     <li class="page-item" :class="{ disabled: page <= 1 }"> -->
+<!--                         <span class="page-link" @click="goToPage(page - 1)">‹</span> -->
+<!--                     </li> -->
+<!--                     <li v-if="visiblePages[0] > 1" class="page-item disabled"> -->
+<!--                         <span class="page-link">…</span> -->
+<!--                     </li> -->
+<!--                     <li v-for="p in visiblePages" :key="p" -->
+<!--                         class="page-item" :class="{ active: p === page }"> -->
+<!--                         <span class="page-link" @click="goToPage(p)">{{ p }}</span> -->
+<!--                     </li> -->
+<!--                     <li v-if="visiblePages[visiblePages.length - 1] < totalPages" class="page-item disabled"> -->
+<!--                         <span class="page-link">…</span> -->
+<!--                     </li> -->
+<!--                     <li class="page-item" :class="{ disabled: page >= totalPages }"> -->
+<!--                         <span class="page-link" @click="goToPage(page + 1)">›</span> -->
+<!--                     </li> -->
+<!--                     <li class="page-item" :class="{ disabled: page >= totalPages }"> -->
+<!--                         <span class="page-link" @click="goToPage(totalPages)" title="Last">»</span> -->
+<!--                     </li> -->
+<!--                 </ul> -->
+<!--             </nav> -->
         </div>
 
         <!-- Loading state -->
@@ -211,39 +222,39 @@
         </div>
 
         <!-- Pagination bottom (hidden during search) -->
-        <div v-if="!isSearchMode && totalPages > 1" class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <small class="text-muted">
-                {{ t.showing }}
-                {{ entries.length === 0 ? 0 : (page - 1) * pageSize + 1 }}–{{ (page - 1) * pageSize + entries.length }}
-                {{ t.of }} {{ total.toLocaleString() }}
-            </small>
-            <nav aria-label="Table pagination bottom">
-                <ul class="pagination pagination-sm mb-0 justify-content-center">
-                    <li class="page-item" :class="{ disabled: page <= 1 }">
-                        <span class="page-link" @click="goToPage(1)" title="First">«</span>
-                    </li>
-                    <li class="page-item" :class="{ disabled: page <= 1 }">
-                        <span class="page-link" @click="goToPage(page - 1)">‹</span>
-                    </li>
-                    <li v-if="visiblePages[0] > 1" class="page-item disabled">
-                        <span class="page-link">…</span>
-                    </li>
-                    <li v-for="p in visiblePages" :key="p"
-                        class="page-item" :class="{ active: p === page }">
-                        <span class="page-link" @click="goToPage(p)">{{ p }}</span>
-                    </li>
-                    <li v-if="visiblePages[visiblePages.length - 1] < totalPages" class="page-item disabled">
-                        <span class="page-link">…</span>
-                    </li>
-                    <li class="page-item" :class="{ disabled: page >= totalPages }">
-                        <span class="page-link" @click="goToPage(page + 1)">›</span>
-                    </li>
-                    <li class="page-item" :class="{ disabled: page >= totalPages }">
-                        <span class="page-link" @click="goToPage(totalPages)" title="Last">»</span>
-                    </li>
-                </ul>
-            </nav>
-        </div>
+<!--         <div v-if="!isSearchMode && totalPages > 1" class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2"> -->
+<!--             <small class="text-muted"> -->
+<!--                 {{ t.showing }} -->
+<!--                 {{ entries.length === 0 ? 0 : (page - 1) * pageSize + 1 }}–{{ (page - 1) * pageSize + entries.length }} -->
+<!--                 {{ t.of }} {{ total.toLocaleString() }} -->
+<!--             </small> -->
+<!--             <nav aria-label="Table pagination bottom"> -->
+<!--                 <ul class="pagination pagination-sm mb-0 justify-content-center"> -->
+<!--                     <li class="page-item" :class="{ disabled: page <= 1 }"> -->
+<!--                         <span class="page-link" @click="goToPage(1)" title="First">«</span> -->
+<!--                     </li> -->
+<!--                     <li class="page-item" :class="{ disabled: page <= 1 }"> -->
+<!--                         <span class="page-link" @click="goToPage(page - 1)">‹</span> -->
+<!--                     </li> -->
+<!--                     <li v-if="visiblePages[0] > 1" class="page-item disabled"> -->
+<!--                         <span class="page-link">…</span> -->
+<!--                     </li> -->
+<!--                     <li v-for="p in visiblePages" :key="p" -->
+<!--                         class="page-item" :class="{ active: p === page }"> -->
+<!--                         <span class="page-link" @click="goToPage(p)">{{ p }}</span> -->
+<!--                     </li> -->
+<!--                     <li v-if="visiblePages[visiblePages.length - 1] < totalPages" class="page-item disabled"> -->
+<!--                         <span class="page-link">…</span> -->
+<!--                     </li> -->
+<!--                     <li class="page-item" :class="{ disabled: page >= totalPages }"> -->
+<!--                         <span class="page-link" @click="goToPage(page + 1)">›</span> -->
+<!--                     </li> -->
+<!--                     <li class="page-item" :class="{ disabled: page >= totalPages }"> -->
+<!--                         <span class="page-link" @click="goToPage(totalPages)" title="Last">»</span> -->
+<!--                     </li> -->
+<!--                 </ul> -->
+<!--             </nav> -->
+<!--         </div> -->
     </div>
 </div>
 
@@ -269,6 +280,7 @@
         data() {
             return {
                 t:            LOCALE,
+                locale:       'bg',
                 entries:      [],
                 total:        0,
                 page:         1,
@@ -406,6 +418,17 @@
                 } catch {
                     this.isAdmin = false;
                 }
+            },
+
+            setLocale(lang) {
+                if (this.locale === lang) return;
+                const existing = document.getElementById('locale-script');
+                if (existing) existing.remove();
+                const script = document.createElement('script');
+                script.id  = 'locale-script';
+                script.src = `locale.${lang}.js?_=${Date.now()}`;
+                script.onload = () => { this.t = LOCALE; this.locale = lang; };
+                document.head.appendChild(script);
             },
 
             async deleteEntry(hash) {
