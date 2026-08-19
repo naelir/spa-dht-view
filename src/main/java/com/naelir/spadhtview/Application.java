@@ -1,7 +1,5 @@
 package com.naelir.spadhtview;
 
-import java.util.Map;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
@@ -32,12 +30,6 @@ public class Application {
     public static void main(String[] args) throws Exception {
         int    port     = Integer.parseInt(System.getProperty("SERVER_PORT", "8000"));
         String repoType = System.getProperty("DB_TYPE", "mongo");
-
-        Map<String, String> getenv = System.getenv();
-        System.out.printf("env %s", getenv);
-
-        Map<Object, Object> prop = System.getProperties();
-        System.out.printf("props %s", prop);
 
         EntryRepository repo;
         if ("memory".equalsIgnoreCase(repoType)) {

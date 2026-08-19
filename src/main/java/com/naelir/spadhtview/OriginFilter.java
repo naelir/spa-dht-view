@@ -27,7 +27,7 @@ import jakarta.ws.rs.ext.Provider;
 public class OriginFilter implements ContainerRequestFilter {
 
     /** Optional override – e.g. {@code https://myapp.example.com}. */
-    private static final String EXPECTED_ORIGIN = System.getProperty("EXPECTED_ORIGIN", "");
+    private static final String EXPECTED_ORIGIN = System.getenv("EXPECTED_ORIGIN");
 
     @Override
     public void filter(ContainerRequestContext ctx) {
@@ -50,10 +50,9 @@ public class OriginFilter implements ContainerRequestFilter {
         String expected = normalizeOrigin(resolveExpected(ctx));
         String candidate = normalizeOrigin(origin != null ? origin : referer);
 
-        if (candidate == null || !candidate.equalsIgnoreCase(expected)) {
-            String entity = String.format("{\"error\":\"Invalid origin: %s (expected %s)\"}", candidate, expected);
+        if (candidate == null || !candidate.contains(expected)) {
             ctx.abortWith(Response.status(Response.Status.FORBIDDEN)
-                    .entity(entity)
+                    .entity("{\"error\":\"Invalid origin\"}")
                     .build());
         }
     }
@@ -68,10 +67,11 @@ public class OriginFilter implements ContainerRequestFilter {
 
     /** Strips the scheme (e.g. {@code https://}) and any trailing {@code /} from the given string. */
     private static String normalizeOrigin(String s) {
-        if (s == null) return null;
+        if (s == null)
+            return null;
         int idx = s.indexOf("://");
-        if (idx >= 0) s = s.substring(idx + 3);
-        if (s.endsWith("/")) s = s.substring(0, s.length() - 1);
+        if (idx >= 0)
+            s = s.substring(idx + 3);
         return s;
     }
 }
