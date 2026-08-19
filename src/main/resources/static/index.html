@@ -149,32 +149,32 @@
                 {{ entries.length === 0 ? 0 : (page - 1) * pageSize + 1 }}–{{ (page - 1) * pageSize + entries.length }}
                 {{ t.of }} {{ total.toLocaleString() }}
             </small>
-<!--             <nav aria-label="Table pagination top"> -->
-<!--                 <ul class="pagination pagination-sm mb-0 justify-content-center"> -->
-<!--                     <li class="page-item" :class="{ disabled: page <= 1 }"> -->
-<!--                         <span class="page-link" @click="goToPage(1)" title="First">«</span> -->
-<!--                     </li> -->
-<!--                     <li class="page-item" :class="{ disabled: page <= 1 }"> -->
-<!--                         <span class="page-link" @click="goToPage(page - 1)">‹</span> -->
-<!--                     </li> -->
-<!--                     <li v-if="visiblePages[0] > 1" class="page-item disabled"> -->
-<!--                         <span class="page-link">…</span> -->
-<!--                     </li> -->
-<!--                     <li v-for="p in visiblePages" :key="p" -->
-<!--                         class="page-item" :class="{ active: p === page }"> -->
-<!--                         <span class="page-link" @click="goToPage(p)">{{ p }}</span> -->
-<!--                     </li> -->
-<!--                     <li v-if="visiblePages[visiblePages.length - 1] < totalPages" class="page-item disabled"> -->
-<!--                         <span class="page-link">…</span> -->
-<!--                     </li> -->
-<!--                     <li class="page-item" :class="{ disabled: page >= totalPages }"> -->
-<!--                         <span class="page-link" @click="goToPage(page + 1)">›</span> -->
-<!--                     </li> -->
-<!--                     <li class="page-item" :class="{ disabled: page >= totalPages }"> -->
-<!--                         <span class="page-link" @click="goToPage(totalPages)" title="Last">»</span> -->
-<!--                     </li> -->
-<!--                 </ul> -->
-<!--             </nav> -->
+            <nav aria-label="Table pagination top">
+                <ul class="pagination pagination-sm mb-0 justify-content-center">
+                    <li class="page-item" :class="{ disabled: page <= 1 }">
+                        <span class="page-link" @click="goToPage(1)" title="First">«</span>
+                    </li>
+                    <li class="page-item" :class="{ disabled: page <= 1 }">
+                        <span class="page-link" @click="goToPage(page - 1)">‹</span>
+                    </li>
+                    <li v-if="visiblePages[0] > 1" class="page-item disabled">
+                        <span class="page-link">…</span>
+                    </li>
+                    <li v-for="p in visiblePages" :key="p"
+                        class="page-item" :class="{ active: p === page }">
+                        <span class="page-link" @click="goToPage(p)">{{ p }}</span>
+                    </li>
+                    <li v-if="visiblePages[visiblePages.length - 1] < totalPages" class="page-item disabled">
+                        <span class="page-link">…</span>
+                    </li>
+                    <li class="page-item" :class="{ disabled: page >= totalPages }">
+                        <span class="page-link" @click="goToPage(page + 1)">›</span>
+                    </li>
+                    <li class="page-item" :class="{ disabled: page >= totalPages }">
+                        <span class="page-link" @click="goToPage(totalPages)" title="Last">»</span>
+                    </li>
+                </ul>
+            </nav>
         </div>
 
         <!-- Loading state -->
@@ -222,39 +222,39 @@
         </div>
 
         <!-- Pagination bottom (hidden during search) -->
-<!--         <div v-if="!isSearchMode && totalPages > 1" class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2"> -->
-<!--             <small class="text-muted"> -->
-<!--                 {{ t.showing }} -->
-<!--                 {{ entries.length === 0 ? 0 : (page - 1) * pageSize + 1 }}–{{ (page - 1) * pageSize + entries.length }} -->
-<!--                 {{ t.of }} {{ total.toLocaleString() }} -->
-<!--             </small> -->
-<!--             <nav aria-label="Table pagination bottom"> -->
-<!--                 <ul class="pagination pagination-sm mb-0 justify-content-center"> -->
-<!--                     <li class="page-item" :class="{ disabled: page <= 1 }"> -->
-<!--                         <span class="page-link" @click="goToPage(1)" title="First">«</span> -->
-<!--                     </li> -->
-<!--                     <li class="page-item" :class="{ disabled: page <= 1 }"> -->
-<!--                         <span class="page-link" @click="goToPage(page - 1)">‹</span> -->
-<!--                     </li> -->
-<!--                     <li v-if="visiblePages[0] > 1" class="page-item disabled"> -->
-<!--                         <span class="page-link">…</span> -->
-<!--                     </li> -->
-<!--                     <li v-for="p in visiblePages" :key="p" -->
-<!--                         class="page-item" :class="{ active: p === page }"> -->
-<!--                         <span class="page-link" @click="goToPage(p)">{{ p }}</span> -->
-<!--                     </li> -->
-<!--                     <li v-if="visiblePages[visiblePages.length - 1] < totalPages" class="page-item disabled"> -->
-<!--                         <span class="page-link">…</span> -->
-<!--                     </li> -->
-<!--                     <li class="page-item" :class="{ disabled: page >= totalPages }"> -->
-<!--                         <span class="page-link" @click="goToPage(page + 1)">›</span> -->
-<!--                     </li> -->
-<!--                     <li class="page-item" :class="{ disabled: page >= totalPages }"> -->
-<!--                         <span class="page-link" @click="goToPage(totalPages)" title="Last">»</span> -->
-<!--                     </li> -->
-<!--                 </ul> -->
-<!--             </nav> -->
-<!--         </div> -->
+        <div v-if="!isSearchMode && totalPages > 1" class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <small class="text-muted">
+                {{ t.showing }}
+                {{ entries.length === 0 ? 0 : (page - 1) * pageSize + 1 }}–{{ (page - 1) * pageSize + entries.length }}
+                {{ t.of }} {{ total.toLocaleString() }}
+            </small>
+            <nav aria-label="Table pagination bottom">
+                <ul class="pagination pagination-sm mb-0 justify-content-center">
+                    <li class="page-item" :class="{ disabled: page <= 1 }">
+                        <span class="page-link" @click="goToPage(1)" title="First">«</span>
+                    </li>
+                    <li class="page-item" :class="{ disabled: page <= 1 }">
+                        <span class="page-link" @click="goToPage(page - 1)">‹</span>
+                    </li>
+                    <li v-if="visiblePages[0] > 1" class="page-item disabled">
+                        <span class="page-link">…</span>
+                    </li>
+                    <li v-for="p in visiblePages" :key="p"
+                        class="page-item" :class="{ active: p === page }">
+                        <span class="page-link" @click="goToPage(p)">{{ p }}</span>
+                    </li>
+                    <li v-if="visiblePages[visiblePages.length - 1] < totalPages" class="page-item disabled">
+                        <span class="page-link">…</span>
+                    </li>
+                    <li class="page-item" :class="{ disabled: page >= totalPages }">
+                        <span class="page-link" @click="goToPage(page + 1)">›</span>
+                    </li>
+                    <li class="page-item" :class="{ disabled: page >= totalPages }">
+                        <span class="page-link" @click="goToPage(totalPages)" title="Last">»</span>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>
 
