@@ -1,5 +1,7 @@
 package com.naelir.spadhtview;
 
+import org.apache.commons.lang3.StringUtils;
+
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.Response;
@@ -59,7 +61,7 @@ public class OriginFilter implements ContainerRequestFilter {
 
     /** Returns the configured expected origin, or derives it from the {@code Host} header. */
     private static String resolveExpected(ContainerRequestContext ctx) {
-        if (!EXPECTED_ORIGIN.isEmpty()) {
+        if (StringUtils.isNotBlank(EXPECTED_ORIGIN)) {
             return EXPECTED_ORIGIN;
         }
         return ctx.getUriInfo().getBaseUri().toString();
