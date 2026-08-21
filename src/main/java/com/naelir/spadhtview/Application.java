@@ -1,5 +1,7 @@
 package com.naelir.spadhtview;
 
+import java.util.logging.Logger;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
@@ -27,13 +29,15 @@ import org.glassfish.jersey.servlet.ServletContainer;
  */
 public class Application {
 
+    private static final Logger LOG = Logger.getLogger(Application.class.getName());
+
     public static void main(String[] args) throws Exception {
         int    port     = Integer.parseInt(System.getProperty("SERVER_PORT", "8000"));
         String repoType = System.getProperty("DB_TYPE", "mongo");
 
         EntryRepository repo;
         if ("memory".equalsIgnoreCase(repoType)) {
-            System.out.println("Using InMemoryEntryRepository");
+            LOG.info("Using InMemoryEntryRepository");
             repo = new InMemoryEntryRepository();
             for (int i = 0; i < 100; i++) {
                 Entry e = new Entry();
@@ -50,7 +54,7 @@ public class Application {
             String mongoUri = System.getProperty("DATABASE_URL", "mongodb://localhost:27017");
             String mongoDb  = System.getProperty("DATABASE_NAME", "dht_view");
             String table  = System.getProperty("MAIN_TABLE", "hashes");
-            System.out.printf("Using MongoEntryRepository  uri=%s  db=%s%n%s", mongoUri, mongoDb, table);
+            LOG.info(String.format("Using MongoEntryRepository  uri=%s  db=%s  table=%s", mongoUri, mongoDb, table));
             repo = new MongoEntryRepository(mongoUri, mongoDb, table);
         }
 
@@ -74,7 +78,7 @@ public class Application {
         server.setHandler(ipBlockingHandler);
         ipBlockingHandler.setHandler(context);
         server.start();
-        System.out.printf("DHT View started on %d/%n", port);
+        LOG.info(String.format("DHT View started on %d", port));
         server.join();
     }
 }

@@ -83,6 +83,24 @@
             <button @click="setLocale('uk')" :class="['btn', 'btn-sm', 'p-0', locale === 'uk' ? 'btn-light' : 'btn-outline-secondary']" title="Українська" style="border-radius:6px;overflow:hidden;line-height:0;">
                 <img src="https://flagcdn.com/w40/ua.png" width="32" height="22" alt="UA" style="display:block;">
             </button>
+            <button @click="setLocale('cr')" :class="['btn', 'btn-sm', 'p-0', locale === 'cr' ? 'btn-light' : 'btn-outline-secondary']" title="Hrvatski" style="border-radius:6px;overflow:hidden;line-height:0;">
+                <img src="https://flagcdn.com/w40/hr.png" width="32" height="22" alt="HR" style="display:block;">
+            </button>
+            <button @click="setLocale('si')" :class="['btn', 'btn-sm', 'p-0', locale === 'si' ? 'btn-light' : 'btn-outline-secondary']" title="Slovenščina" style="border-radius:6px;overflow:hidden;line-height:0;">
+                <img src="https://flagcdn.com/w40/si.png" width="32" height="22" alt="SI" style="display:block;">
+            </button>
+            <button @click="setLocale('sk')" :class="['btn', 'btn-sm', 'p-0', locale === 'sk' ? 'btn-light' : 'btn-outline-secondary']" title="Slovenčina" style="border-radius:6px;overflow:hidden;line-height:0;">
+                <img src="https://flagcdn.com/w40/sk.png" width="32" height="22" alt="SK" style="display:block;">
+            </button>
+            <button @click="setLocale('cz')" :class="['btn', 'btn-sm', 'p-0', locale === 'cz' ? 'btn-light' : 'btn-outline-secondary']" title="Čeština" style="border-radius:6px;overflow:hidden;line-height:0;">
+                <img src="https://flagcdn.com/w40/cz.png" width="32" height="22" alt="CZ" style="display:block;">
+            </button>
+            <button @click="setLocale('pl')" :class="['btn', 'btn-sm', 'p-0', locale === 'pl' ? 'btn-light' : 'btn-outline-secondary']" title="Polski" style="border-radius:6px;overflow:hidden;line-height:0;">
+                <img src="https://flagcdn.com/w40/pl.png" width="32" height="22" alt="PL" style="display:block;">
+            </button>
+            <button @click="setLocale('by')" :class="['btn', 'btn-sm', 'p-0', locale === 'by' ? 'btn-light' : 'btn-outline-secondary']" title="Беларуская" style="border-radius:6px;overflow:hidden;line-height:0;">
+                <img src="https://flagcdn.com/w40/by.png" width="32" height="22" alt="BY" style="display:block;">
+            </button>
         </div>
     </div>
 
@@ -149,32 +167,32 @@
                 {{ entries.length === 0 ? 0 : (page - 1) * pageSize + 1 }}–{{ (page - 1) * pageSize + entries.length }}
                 {{ t.of }} {{ total.toLocaleString() }}
             </small>
-            <nav aria-label="Table pagination top">
-                <ul class="pagination pagination-sm mb-0 justify-content-center">
-                    <li class="page-item" :class="{ disabled: page <= 1 }">
-                        <span class="page-link" @click="goToPage(1)" title="First">«</span>
-                    </li>
-                    <li class="page-item" :class="{ disabled: page <= 1 }">
-                        <span class="page-link" @click="goToPage(page - 1)">‹</span>
-                    </li>
-                    <li v-if="visiblePages[0] > 1" class="page-item disabled">
-                        <span class="page-link">…</span>
-                    </li>
-                    <li v-for="p in visiblePages" :key="p"
-                        class="page-item" :class="{ active: p === page }">
-                        <span class="page-link" @click="goToPage(p)">{{ p }}</span>
-                    </li>
-                    <li v-if="visiblePages[visiblePages.length - 1] < totalPages" class="page-item disabled">
-                        <span class="page-link">…</span>
-                    </li>
-                    <li class="page-item" :class="{ disabled: page >= totalPages }">
-                        <span class="page-link" @click="goToPage(page + 1)">›</span>
-                    </li>
-                    <li class="page-item" :class="{ disabled: page >= totalPages }">
-                        <span class="page-link" @click="goToPage(totalPages)" title="Last">»</span>
-                    </li>
-                </ul>
-            </nav>
+<!--             <nav aria-label="Table pagination top"> -->
+<!--                 <ul class="pagination pagination-sm mb-0 justify-content-center"> -->
+<!--                     <li class="page-item" :class="{ disabled: page <= 1 }"> -->
+<!--                         <span class="page-link" @click="goToPage(1)" title="First">«</span> -->
+<!--                     </li> -->
+<!--                     <li class="page-item" :class="{ disabled: page <= 1 }"> -->
+<!--                         <span class="page-link" @click="goToPage(page - 1)">‹</span> -->
+<!--                     </li> -->
+<!--                     <li v-if="visiblePages[0] > 1" class="page-item disabled"> -->
+<!--                         <span class="page-link">…</span> -->
+<!--                     </li> -->
+<!--                     <li v-for="p in visiblePages" :key="p" -->
+<!--                         class="page-item" :class="{ active: p === page }"> -->
+<!--                         <span class="page-link" @click="goToPage(p)">{{ p }}</span> -->
+<!--                     </li> -->
+<!--                     <li v-if="visiblePages[visiblePages.length - 1] < totalPages" class="page-item disabled"> -->
+<!--                         <span class="page-link">…</span> -->
+<!--                     </li> -->
+<!--                     <li class="page-item" :class="{ disabled: page >= totalPages }"> -->
+<!--                         <span class="page-link" @click="goToPage(page + 1)">›</span> -->
+<!--                     </li> -->
+<!--                     <li class="page-item" :class="{ disabled: page >= totalPages }"> -->
+<!--                         <span class="page-link" @click="goToPage(totalPages)" title="Last">»</span> -->
+<!--                     </li> -->
+<!--                 </ul> -->
+<!--             </nav> -->
         </div>
 
         <!-- Loading state -->
@@ -228,32 +246,32 @@
                 {{ entries.length === 0 ? 0 : (page - 1) * pageSize + 1 }}–{{ (page - 1) * pageSize + entries.length }}
                 {{ t.of }} {{ total.toLocaleString() }}
             </small>
-            <nav aria-label="Table pagination bottom">
-                <ul class="pagination pagination-sm mb-0 justify-content-center">
-                    <li class="page-item" :class="{ disabled: page <= 1 }">
-                        <span class="page-link" @click="goToPage(1)" title="First">«</span>
-                    </li>
-                    <li class="page-item" :class="{ disabled: page <= 1 }">
-                        <span class="page-link" @click="goToPage(page - 1)">‹</span>
-                    </li>
-                    <li v-if="visiblePages[0] > 1" class="page-item disabled">
-                        <span class="page-link">…</span>
-                    </li>
-                    <li v-for="p in visiblePages" :key="p"
-                        class="page-item" :class="{ active: p === page }">
-                        <span class="page-link" @click="goToPage(p)">{{ p }}</span>
-                    </li>
-                    <li v-if="visiblePages[visiblePages.length - 1] < totalPages" class="page-item disabled">
-                        <span class="page-link">…</span>
-                    </li>
-                    <li class="page-item" :class="{ disabled: page >= totalPages }">
-                        <span class="page-link" @click="goToPage(page + 1)">›</span>
-                    </li>
-                    <li class="page-item" :class="{ disabled: page >= totalPages }">
-                        <span class="page-link" @click="goToPage(totalPages)" title="Last">»</span>
-                    </li>
-                </ul>
-            </nav>
+<!--             <nav aria-label="Table pagination bottom"> -->
+<!--                 <ul class="pagination pagination-sm mb-0 justify-content-center"> -->
+<!--                     <li class="page-item" :class="{ disabled: page <= 1 }"> -->
+<!--                         <span class="page-link" @click="goToPage(1)" title="First">«</span> -->
+<!--                     </li> -->
+<!--                     <li class="page-item" :class="{ disabled: page <= 1 }"> -->
+<!--                         <span class="page-link" @click="goToPage(page - 1)">‹</span> -->
+<!--                     </li> -->
+<!--                     <li v-if="visiblePages[0] > 1" class="page-item disabled"> -->
+<!--                         <span class="page-link">…</span> -->
+<!--                     </li> -->
+<!--                     <li v-for="p in visiblePages" :key="p" -->
+<!--                         class="page-item" :class="{ active: p === page }"> -->
+<!--                         <span class="page-link" @click="goToPage(p)">{{ p }}</span> -->
+<!--                     </li> -->
+<!--                     <li v-if="visiblePages[visiblePages.length - 1] < totalPages" class="page-item disabled"> -->
+<!--                         <span class="page-link">…</span> -->
+<!--                     </li> -->
+<!--                     <li class="page-item" :class="{ disabled: page >= totalPages }"> -->
+<!--                         <span class="page-link" @click="goToPage(page + 1)">›</span> -->
+<!--                     </li> -->
+<!--                     <li class="page-item" :class="{ disabled: page >= totalPages }"> -->
+<!--                         <span class="page-link" @click="goToPage(totalPages)" title="Last">»</span> -->
+<!--                     </li> -->
+<!--                 </ul> -->
+<!--             </nav> -->
         </div>
     </div>
 </div>

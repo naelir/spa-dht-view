@@ -44,7 +44,6 @@ public class OriginFilter implements ContainerRequestFilter {
 
         if (origin == null && referer == null) {
             ctx.abortWith(Response.status(Response.Status.FORBIDDEN)
-                    .entity("{\"error\":\"Missing origin\"}")
                     .build());
             return;
         }
@@ -54,7 +53,6 @@ public class OriginFilter implements ContainerRequestFilter {
 
         if (candidate == null || !candidate.contains(expected)) {
             ctx.abortWith(Response.status(Response.Status.FORBIDDEN)
-                    .entity("{\"error\":\"Invalid origin\"}")
                     .build());
         }
     }
