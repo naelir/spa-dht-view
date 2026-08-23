@@ -323,12 +323,34 @@
     </div>
 </div>
 
-<!-- Localization strings -->
-<script src="locale.bg.js"></script>
 <!-- Vue 3 + Axios from CDN (no build step required) -->
 <script src="https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios@1.7.9/dist/axios.min.js"></script>
 <script>
+    /**
+     * Map a BCP-47 language tag (e.g. "bg", "uk-UA", "cs-CZ") to one of the
+     * supported locale keys.  Falls back to 'bg' when no match is found.
+     */
+    function detectLocale() {
+        const LANG_MAP = {
+            bg: 'bg',
+            mk: 'mk',
+            uk: 'uk', ua: 'uk',
+            hr: 'cr', cr: 'cr',
+            sl: 'si', si: 'si',
+            sk: 'sk',
+            cs: 'cz', cz: 'cz',
+            pl: 'pl',
+            be: 'by', by: 'by'
+        };
+        const langs = navigator.languages?.length ? navigator.languages : [navigator.language];
+        for (const tag of langs) {
+            const key = tag.split('-')[0].toLowerCase();
+            if (LANG_MAP[key]) return LANG_MAP[key];
+        }
+        return 'bg'; // default fallback
+    }
+
     function t() {
         const buf  = new ArrayBuffer(8);
         const view = new DataView(buf);
@@ -341,11 +363,12 @@
 
     const { createApp } = Vue;
 
+    function mountApp(detectedLocale) {
     createApp({
         data() {
             return {
                 t:            LOCALE,
-                locale:       'bg',
+                locale:       detectedLocale,
                 entries:      [],
                 total:        0,
                 page:         1,
@@ -518,6 +541,23 @@
             this.fetchEntries();
         }
     }).mount('#app');
+    } // end mountApp
+
+    // Dynamically load the detected locale file, then mount Vue.
+    (function () {
+        const locale = detectLocale();
+        const script = document.createElement('script');
+        script.src = 'locale.' + locale + '.js';
+        script.onload = function () { mountApp(locale); };
+        script.onerror = function () {
+            // Fallback: try 'bg' if detected locale file fails to load
+            const fallback = document.createElement('script');
+            fallback.src = 'locale.bg.js';
+            fallback.onload = function () { mountApp('bg'); };
+            document.head.appendChild(fallback);
+        };
+        document.head.appendChild(script);
+    })();
 </script>
 </body>
 </html>
