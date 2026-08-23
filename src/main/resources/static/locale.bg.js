@@ -1,7 +1,3 @@
-/**
- * Bulgarian (bg) localization strings.
- * To swap language, replace this file or swap the <script> reference in index.html.
- */
 window.LOCALE = {
     total:              'общо',
     searchPlaceholder:  'потърси по име…',

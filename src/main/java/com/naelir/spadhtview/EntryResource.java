@@ -3,6 +3,7 @@ package com.naelir.spadhtview;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -20,6 +21,7 @@ import jakarta.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class EntryResource {
+    private static final Logger LOG = Logger.getLogger(EntryResource.class.getName());
 
     @Inject
     private EntryRepository repo;
@@ -67,6 +69,7 @@ public class EntryResource {
                     .entity("Query parameter 'name' is required")
                     .build();
         }
+        LOG.info(name);
         List<Entry> results = repo.findByName(name);
         return Response.ok(results).build();
     }

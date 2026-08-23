@@ -1,8 +1,3 @@
-/**
- * North Makedonian (mk) localization strings.
- * To swap language, replace this file or swap the <script> reference in index.html.
- */
-
 window.LOCALE = {
     total:              'всього',
     searchPlaceholder:  'пошук за назвою…',

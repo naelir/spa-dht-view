@@ -4,6 +4,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Logger;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
@@ -22,10 +24,18 @@ import org.eclipse.jetty.util.Callback;
  */
 public class IpBlockingHandler extends Handler.Wrapper {
 
+    private static final Logger LOG = Logger.getLogger(IpBlockingHandler.class.getName());
+    private static final long LOG_INTERVAL = 100;
+    private final AtomicLong blockedCount = new AtomicLong(0);
+
     @Override
     public boolean handle(Request request, Response response, Callback callback) throws Exception {
         String remoteIp = resolveIp(request);
         if (!isAllowed(remoteIp)) {
+            long count = blockedCount.incrementAndGet();
+            if (count % LOG_INTERVAL == 0) {
+                LOG.warning("Blocked requests count: " + count);
+            }
             response.setStatus(403);
             byte[] body = "Forbidden".getBytes(StandardCharsets.UTF_8);
             response.write(true, ByteBuffer.wrap(body), callback);
