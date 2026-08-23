@@ -29,7 +29,7 @@ import jakarta.ws.rs.ext.Provider;
 public class OriginFilter implements ContainerRequestFilter {
 
     /** Optional override – e.g. {@code https://myapp.example.com}. */
-    private static final String EXPECTED_ORIGIN = System.getenv("EXPECTED_ORIGIN");
+    private static final String[] EXPECTED_ORIGIN = System.getenv("EXPECTED_ORIGIN") != null ? System.getenv("EXPECTED_ORIGIN").split(";") : new String[0];
 
     @Override
     public void filter(ContainerRequestContext ctx) {
@@ -48,21 +48,21 @@ public class OriginFilter implements ContainerRequestFilter {
             return;
         }
 
-        String expected = normalizeOrigin(resolveExpected(ctx));
         String candidate = normalizeOrigin(origin != null ? origin : referer);
 
-        if (candidate == null || !candidate.contains(expected)) {
+        if (candidate == null || isOkOrigin(candidate) == false) {
             ctx.abortWith(Response.status(Response.Status.FORBIDDEN)
                     .build());
         }
     }
 
-    /** Returns the configured expected origin, or derives it from the {@code Host} header. */
-    private static String resolveExpected(ContainerRequestContext ctx) {
-        if (StringUtils.isNotBlank(EXPECTED_ORIGIN)) {
-            return EXPECTED_ORIGIN;
+    private boolean isOkOrigin(String candidate) {
+        for (int i = 0; i < EXPECTED_ORIGIN.length; i++) {
+            if (candidate.contains(EXPECTED_ORIGIN[i])) {
+                return true;
+            }
         }
-        return ctx.getUriInfo().getBaseUri().toString();
+        return false;
     }
 
     /** Strips the scheme (e.g. {@code https://}) and any trailing {@code /} from the given string. */
