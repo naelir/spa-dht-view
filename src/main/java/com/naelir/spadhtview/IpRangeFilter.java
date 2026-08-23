@@ -13,17 +13,17 @@ public class IpRangeFilter {
     public static final String UNKNOWN = "Unknown";
     public static final String DEFAULT = "default";
     public static final List<IpRange> RANGES_ALLOW = getAllowRanges();
-    public static final List<IpRange> RANGES_DENY = getDenyRanges();
+//    public static final List<IpRange> RANGES_DENY = getDenyRanges();
     
-    public static boolean isDenied(byte[] ip) {
-        BigInteger address = toBigInteger(ip);
-        for (IpRange ipRange : RANGES_DENY) {
-            if (address.compareTo(ipRange.from) >= 0 && address.compareTo(ipRange.to) <= 0) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    public static boolean isDenied(byte[] ip) {
+//        BigInteger address = toBigInteger(ip);
+//        for (IpRange ipRange : RANGES_DENY) {
+//            if (address.compareTo(ipRange.from) >= 0 && address.compareTo(ipRange.to) <= 0) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     public static boolean isAllowed(byte[] ip) {
         BigInteger address = toBigInteger(ip);
@@ -106,6 +106,9 @@ public class IpRangeFilter {
         return null;
     }
 
+    static BigInteger toBigInteger(String ip) {
+        return toBigInteger(toBytes(ip));        
+    }
     /**
      * Converts the raw byte array of an {@link InetAddress} to an unsigned
      * {@link BigInteger}. The byte array is always big-endian (most-significant

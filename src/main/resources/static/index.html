@@ -64,6 +64,53 @@
         .badge.bg-secondary { background-color: #2e3d50 !important; color: #f0f4f8 !important; }
         /* Hide app until Vue has mounted to prevent flash of un-rendered template */
         [v-cloak] { display: none !important; }
+
+        /* ── Mobile / smartphone layout ──────────────────────────────────── */
+        @media (max-width: 767.98px) {
+            /* Tighten outer padding */
+            .container-lg { padding-left: .75rem; padding-right: .75rem; }
+
+            /* Header: stack title + badge on top, flags below */
+            .d-flex.align-items-center.mb-4 {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: .5rem !important;
+            }
+            .d-flex.align-items-center.mb-4 .ms-auto {
+                margin-left: 0 !important;
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            /* Flag buttons: smaller, tighter */
+            .d-flex.align-items-center.mb-4 .ms-auto .btn {
+                flex: 0 0 auto;
+            }
+
+            /* Hide heavy table columns on small screens */
+            .table .hash-col,
+            .table thead th.hash-col {
+                display: none;
+            }
+            /* Files & Size columns (3rd and 4th after name) */
+            .table td:nth-child(4),
+            .table th:nth-child(4),
+            .table td:nth-child(5),
+            .table th:nth-child(5) {
+                display: none;
+            }
+
+            /* Make the name column wrap instead of overflow */
+            .table td:nth-child(2) { word-break: break-word; max-width: 140px; }
+
+            /* Toolbar: stack search + controls */
+            .card-body .row { flex-direction: column; }
+            .card-body .col,
+            .card-body .col-auto { width: 100% !important; max-width: 100% !important; flex: none !important; }
+
+            /* Pagination info: smaller font */
+            .card-footer small { font-size: .75rem; }
+        }
     </style>
 </head>
 <body>
