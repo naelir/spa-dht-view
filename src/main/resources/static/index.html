@@ -175,18 +175,6 @@
                         <button v-if="isSearchMode" class="btn btn-outline-secondary" @click="clearSearch" title="Clear search">✕</button>
                     </div>
                 </div>
-                <!-- Rows per page (hidden while searching) -->
-                <div v-if="!isSearchMode" class="col-auto">
-                    <label class="col-form-label text-muted small">{{ t.rowsLabel }}</label>
-                </div>
-                <div v-if="!isSearchMode" class="col-auto">
-                    <select class="form-select form-select-sm" v-model.number="pageSize" @change="onPageSizeChange">
-                        <option :value="10">10</option>
-                        <option :value="20">20</option>
-                        <option :value="50">50</option>
-                        <option :value="100">100</option>
-                    </select>
-                </div>
                 <div class="col-auto">
                     <button v-if="!isSearchMode" class="btn btn-sm btn-outline-dark" @click="fetchEntries" :disabled="loading">
                         {{ t.refreshButton }}
@@ -372,7 +360,7 @@
                 entries:      [],
                 total:        0,
                 page:         1,
-                pageSize:     20,
+                pageSize:     50,
                 totalPages:   0,
                 loading:      false,
                 error:        null,

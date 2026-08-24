@@ -8,24 +8,43 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class IpRangeFilter {
+    private static final Logger LOG = Logger.getLogger(IpRangeFilter.class.getName());
+
     public static final String UNKNOWN = "Unknown";
     public static final String DEFAULT = "default";
     public static final List<IpRange> RANGES_ALLOW = getAllowRanges();
-//    public static final List<IpRange> RANGES_DENY = getDenyRanges();
-    
-//    public static boolean isDenied(byte[] ip) {
-//        BigInteger address = toBigInteger(ip);
-//        for (IpRange ipRange : RANGES_DENY) {
-//            if (address.compareTo(ipRange.from) >= 0 && address.compareTo(ipRange.to) <= 0) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+    public static final List<IpRange> RANGES_DENY = new ArrayList<>();
+
+    public static boolean isDenied(byte[] ip) {
+        BigInteger address = toBigInteger(ip);
+        for (IpRange ipRange : RANGES_DENY) {
+            if (address.compareTo(ipRange.from) >= 0 && address.compareTo(ipRange.to) <= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Permanently bans a single IP address by adding it to {@link #RANGES_DENY}.
+     * Safe to call from multiple threads.
+     */
+    public static synchronized void ban(String ip) {
+        BigInteger address = toBigInteger(ip);
+        // avoid duplicate entries
+        for (IpRange existing : RANGES_DENY) {
+            if (existing.from.equals(address)) return;
+        }
+        IpRange range = new IpRange(ip, ip, "BANNED");
+        RANGES_DENY.add(range);
+        LOG.info("[IpRangeFilter] Permanently banned IP: " + ip);
+    }
 
     public static boolean isAllowed(byte[] ip) {
+        if (isDenied(ip)) return false;
         BigInteger address = toBigInteger(ip);
         for (IpRange ipRange : RANGES_ALLOW) {
             if (address.compareTo(ipRange.from) >= 0 && address.compareTo(ipRange.to) <= 0) {

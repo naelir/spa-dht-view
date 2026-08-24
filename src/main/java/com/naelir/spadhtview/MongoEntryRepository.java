@@ -59,13 +59,11 @@ public class MongoEntryRepository implements EntryRepository {
     }
 
     @Override
-    public List<Entry> findAll(int page, int pageSize) {
-        int skip = Math.max(0, (page - 1) * pageSize);
+    public List<Entry> getLast() {
         List<Entry> results = new ArrayList<>();
         collection.find()
                 .sort(Sorts.descending("_id"))
-                .skip(skip)
-                .limit(pageSize)
+                .limit(50)
                 .forEach(doc -> results.add(fromDocument(doc)));
         return results;
     }

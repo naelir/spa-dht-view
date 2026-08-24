@@ -1,6 +1,9 @@
 package com.naelir.spadhtview;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
@@ -8,15 +11,17 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 
 /**
- * Leaky-bucket rate limiter applied to all {@code /api/} requests.
+ * Leaky-bucket rate limiter applied to all requests.
  *
  * <p>Each unique remote IP is allowed at most {@link #MAX_REQUESTS_PER_WINDOW}
  * requests within a sliding window of {@link #WINDOW_MS} milliseconds.
  * Requests that exceed the limit receive {@code 429 Too Many Requests}.
+ * After {@link #BAN_THRESHOLD} violations the IP is permanently banned via
+ * {@link IpRangeFilter#ban(String)} and subsequent requests get {@code 403 Forbidden}.
  *
  * <p>Configurable via system properties:
  * <ul>
- *   <li>{@code rate.limit}        – max requests per window per IP (default 60)</li>
+ *   <li>{@code rate.limit}        – max requests per window per IP (default 10)</li>
  *   <li>{@code rate.limit.window} – window size in milliseconds (default 60 000 = 1 minute)</li>
  * </ul>
  */
@@ -27,23 +32,32 @@ public class RateLimitFilter implements ContainerRequestFilter {
             Integer.parseInt(System.getProperty("rate.limit", "10"));
     private static final long WINDOW_MS =
             Long.parseLong(System.getProperty("rate.limit.window", "60000"));
+    private static final int  BAN_THRESHOLD = 3;
 
     /** Tracks [requestCount, windowStartMs] per IP. */
-    private final ConcurrentHashMap<String, long[]> buckets = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, long[]>      buckets    = new ConcurrentHashMap<>();
+    /** Tracks how many times each IP has exceeded the rate limit. */
+    private final ConcurrentHashMap<String, AtomicInteger> violations = new ConcurrentHashMap<>();
 
     @Override
     public void filter(ContainerRequestContext ctx) {
-        String path = ctx.getUriInfo().getPath();
-        if (!path.startsWith("api/") && !path.startsWith("/api/")) {
-            return; // only guard the REST API
-        }
-
         String ip = remoteIp(ctx);
-        long   now = System.currentTimeMillis();
+
+        // Reject permanently banned IPs immediately
+        try {
+            byte[] ipBytes = InetAddress.getByName(ip).getAddress();
+            if (IpRangeFilter.isDenied(ipBytes)) {
+                ctx.abortWith(Response.status(Response.Status.FORBIDDEN)
+                        .entity("{\"error\":\"Forbidden\"}")
+                        .build());
+                return;
+            }
+        } catch (UnknownHostException ignored) {}
+
+        long now = System.currentTimeMillis();
 
         buckets.compute(ip, (k, entry) -> {
             if (entry == null || now - entry[1] > WINDOW_MS) {
-                // new bucket or expired window
                 return new long[]{ 1L, now };
             }
             entry[0]++;
@@ -52,6 +66,11 @@ public class RateLimitFilter implements ContainerRequestFilter {
 
         long[] bucket = buckets.get(ip);
         if (bucket[0] > MAX_REQUESTS_PER_WINDOW) {
+            int count = violations.computeIfAbsent(ip, k -> new AtomicInteger(0))
+                                  .incrementAndGet();
+            if (count >= BAN_THRESHOLD && "unknown".equals(ip) == false) {
+                IpRangeFilter.ban(ip);
+            }
             ctx.abortWith(Response.status(429)
                     .entity("{\"error\":\"Too many requests\"}")
                     .header("Retry-After", String.valueOf(WINDOW_MS / 1000))
@@ -68,8 +87,6 @@ public class RateLimitFilter implements ContainerRequestFilter {
         if (xff != null && !xff.isBlank()) {
             return xff.split(",")[0].trim();
         }
-        // ContainerRequestContext does not expose the socket address directly;
-        // fall back to a property set by the servlet container.
         Object addr = ctx.getProperty("jakarta.servlet.request.remoteAddr");
         return addr != null ? addr.toString() : "unknown";
     }

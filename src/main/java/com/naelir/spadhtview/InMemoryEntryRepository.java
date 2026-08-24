@@ -18,12 +18,10 @@ public class InMemoryEntryRepository implements EntryRepository {
 
 
     @Override
-    public List<Entry> findAll(int page, int pageSize) {
-        int skip = Math.max(0, (page - 1) * pageSize);
+    public List<Entry> getLast() {
         return store.stream()
                 .sorted(Comparator.comparingLong((Entry e) -> e.foundTime).reversed())
-                .skip(skip)
-                .limit(pageSize)
+                .limit(50)
                 .toList();
     }
 

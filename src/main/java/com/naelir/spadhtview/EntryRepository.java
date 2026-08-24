@@ -5,7 +5,7 @@ import java.util.List;
 public interface EntryRepository {
 
     /** Returns a page of entries sorted by foundTime descending. */
-    List<Entry> findAll(int page, int pageSize);
+    List<Entry> getLast();
 
     /** Total number of entries. */
     long count();

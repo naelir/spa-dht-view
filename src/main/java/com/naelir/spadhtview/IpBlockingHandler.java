@@ -27,6 +27,7 @@ public class IpBlockingHandler extends Handler.Wrapper {
     private static final Logger LOG = Logger.getLogger(IpBlockingHandler.class.getName());
     private static final long LOG_INTERVAL = 100;
     private final AtomicLong blockedCount = new AtomicLong(0);
+    private final AtomicLong allowedCount = new AtomicLong(0);
 
     @Override
     public boolean handle(Request request, Response response, Callback callback) throws Exception {
@@ -40,6 +41,10 @@ public class IpBlockingHandler extends Handler.Wrapper {
             byte[] body = "Forbidden".getBytes(StandardCharsets.UTF_8);
             response.write(true, ByteBuffer.wrap(body), callback);
             return true;
+        }
+        long count = allowedCount.incrementAndGet();
+        if (count % LOG_INTERVAL == 0) {
+            LOG.info("Allowed requests count: " + count);
         }
         return super.handle(request, response, callback);
     }
