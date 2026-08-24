@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.bson.Document;
-import org.bson.conversions.Bson;
 
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoClient;
@@ -15,7 +14,6 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
-import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
 
 public class MongoEntryRepository implements EntryRepository {
@@ -84,21 +82,6 @@ public class MongoEntryRepository implements EntryRepository {
             throw e;
         }
         return entry;
-    }
-
-    @Override
-    public boolean update(Entry entry) {
-        Bson eq = Filters.eq("h", entry.hash);
-        Document document = toDocument(entry);
-        ReplaceOptions upsert = new ReplaceOptions().upsert(false);
-        long modified = collection.replaceOne(eq, document, upsert).getModifiedCount();
-        return modified > 0;
-    }
-
-    @Override
-    public Entry findByHash(String hash) {
-        Document doc = collection.find(Filters.eq("h", hash)).first();
-        return doc != null ? fromDocument(doc) : null;
     }
 
     @Override

@@ -31,15 +31,6 @@ public class InMemoryEntryRepository implements EntryRepository {
     }
 
     @Override
-    public Entry findByHash(String hash) {
-        if (hash == null) return null;
-        return store.stream()
-                .filter(e -> hash.equals(e.hash))
-                .findFirst()
-                .orElse(null);
-    }
-
-    @Override
     public List<Entry> findByName(String pattern) {
         if (pattern == null || pattern.length() < 3) return List.of();
         String[] parts = pattern.split(" ", -1);
@@ -58,23 +49,8 @@ public class InMemoryEntryRepository implements EntryRepository {
 
     @Override
     public synchronized Entry insert(Entry entry) {
-        // duplicate hash – skip silently
-        if (findByHash(entry.hash) != null) {
-            return entry;
-        }
         store.add(copy(entry));
         return entry;
-    }
-
-    @Override
-    public synchronized boolean update(Entry entry) {
-        for (int i = 0; i < store.size(); i++) {
-            if (entry.hash != null && entry.hash.equals(store.get(i).hash)) {
-                store.set(i, copy(entry));
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

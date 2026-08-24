@@ -39,7 +39,7 @@ public class Application {
         if ("memory".equalsIgnoreCase(repoType)) {
             LOG.info("Using InMemoryEntryRepository");
             repo = new InMemoryEntryRepository();
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 400; i++) {
                 Entry e = new Entry();
                 e.name      = RandomStringUtils.randomAlphanumeric(70);
                 e.hash      = RandomStringUtils.randomAlphanumeric(40);
