@@ -28,10 +28,8 @@ import jakarta.ws.rs.ext.Provider;
 @Provider
 public class RateLimitFilter implements ContainerRequestFilter {
 
-    private static final int  MAX_REQUESTS_PER_WINDOW =
-            Integer.parseInt(System.getProperty("rate.limit", "10"));
-    private static final long WINDOW_MS =
-            Long.parseLong(System.getProperty("rate.limit.window", "60000"));
+    private static final int  MAX_REQUESTS_PER_WINDOW = Integer.parseInt(System.getProperty("rate.limit", "20"));
+    private static final long WINDOW_MS = Long.parseLong(System.getProperty("rate.limit.window", "60000"));
     private static final int  BAN_THRESHOLD = 3;
 
     /** Tracks [requestCount, windowStartMs] per IP. */
