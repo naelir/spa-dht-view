@@ -48,6 +48,7 @@ public class IpRangeFilter {
         BigInteger address = toBigInteger(ip);
         for (IpRange ipRange : RANGES_ALLOW) {
             if (address.compareTo(ipRange.from) >= 0 && address.compareTo(ipRange.to) <= 0) {
+                LOG.info("[IpRangeFilter] Allowing IP: " + ip + "from country: " + (ipRange.country != null ? ipRange.country : UNKNOWN));
                 return true;
             }
         }

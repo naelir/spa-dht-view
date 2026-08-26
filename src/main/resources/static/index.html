@@ -127,8 +127,14 @@
             <button @click="setLocale('mk')" :class="['btn', 'btn-sm', 'p-0', locale === 'mk' ? 'btn-light' : 'btn-outline-secondary']" title="Македонски" style="border-radius:6px;overflow:hidden;line-height:0;">
                 <img src="https://flagcdn.com/w40/mk.png" width="32" height="22" alt="MK" style="display:block;">
             </button>
-            <button @click="setLocale('uk')" :class="['btn', 'btn-sm', 'p-0', locale === 'uk' ? 'btn-light' : 'btn-outline-secondary']" title="Українська" style="border-radius:6px;overflow:hidden;line-height:0;">
-                <img src="https://flagcdn.com/w40/ua.png" width="32" height="22" alt="UA" style="display:block;">
+<!--             <button @click="setLocale('sr')" :class="['btn', 'btn-sm', 'p-0', locale === 'sr' ? 'btn-light' : 'btn-outline-secondary']" title="Srpski" style="border-radius:6px;overflow:hidden;line-height:0;"> -->
+<!--                 <img src="https://flagcdn.com/w40/rs.png" width="32" height="22" alt="RS" style="display:block;"> -->
+<!--             </button> -->
+            <button @click="setLocale('me')" :class="['btn', 'btn-sm', 'p-0', locale === 'me' ? 'btn-light' : 'btn-outline-secondary']" title="Црногорски" style="border-radius:6px;overflow:hidden;line-height:0;">
+                <img src="https://flagcdn.com/w40/me.png" width="32" height="22" alt="ME" style="display:block;">
+            </button>
+            <button @click="setLocale('bs')" :class="['btn', 'btn-sm', 'p-0', locale === 'bs' ? 'btn-light' : 'btn-outline-secondary']" title="Bosanski" style="border-radius:6px;overflow:hidden;line-height:0;">
+                <img src="https://flagcdn.com/w40/ba.png" width="32" height="22" alt="BA" style="display:block;">
             </button>
             <button @click="setLocale('cr')" :class="['btn', 'btn-sm', 'p-0', locale === 'cr' ? 'btn-light' : 'btn-outline-secondary']" title="Hrvatski" style="border-radius:6px;overflow:hidden;line-height:0;">
                 <img src="https://flagcdn.com/w40/hr.png" width="32" height="22" alt="HR" style="display:block;">
@@ -145,9 +151,15 @@
             <button @click="setLocale('pl')" :class="['btn', 'btn-sm', 'p-0', locale === 'pl' ? 'btn-light' : 'btn-outline-secondary']" title="Polski" style="border-radius:6px;overflow:hidden;line-height:0;">
                 <img src="https://flagcdn.com/w40/pl.png" width="32" height="22" alt="PL" style="display:block;">
             </button>
-            <button @click="setLocale('by')" :class="['btn', 'btn-sm', 'p-0', locale === 'by' ? 'btn-light' : 'btn-outline-secondary']" title="Беларуская" style="border-radius:6px;overflow:hidden;line-height:0;">
-                <img src="https://flagcdn.com/w40/by.png" width="32" height="22" alt="BY" style="display:block;">
+<!--             <button @click="setLocale('by')" :class="['btn', 'btn-sm', 'p-0', locale === 'by' ? 'btn-light' : 'btn-outline-secondary']" title="Беларуская" style="border-radius:6px;overflow:hidden;line-height:0;"> -->
+<!--                 <img src="https://flagcdn.com/w40/by.png" width="32" height="22" alt="BY" style="display:block;"> -->
+<!--             </button> -->
+            <button @click="setLocale('uk')" :class="['btn', 'btn-sm', 'p-0', locale === 'uk' ? 'btn-light' : 'btn-outline-secondary']" title="Українська" style="border-radius:6px;overflow:hidden;line-height:0;">
+                <img src="https://flagcdn.com/w40/ua.png" width="32" height="22" alt="UA" style="display:block;">
             </button>
+<!--             <button @click="setLocale('ru')" :class="['btn', 'btn-sm', 'p-0', locale === 'ru' ? 'btn-light' : 'btn-outline-secondary']" title="Русский" style="border-radius:6px;overflow:hidden;line-height:0;"> -->
+<!--                 <img src="https://flagcdn.com/w40/ru.png" width="32" height="22" alt="RU" style="display:block;"> -->
+<!--             </button> -->
         </div>
     </div>
 
@@ -329,7 +341,11 @@
             sk: 'sk',
             cs: 'cz', cz: 'cz',
             pl: 'pl',
-            be: 'by', by: 'by'
+            be: 'by', by: 'by',
+            cnr: 'me', me: 'me',
+            sr: 'sr',
+            bs: 'bs',
+            ru: 'ru'
         };
         const langs = navigator.languages?.length ? navigator.languages : [navigator.language];
         for (const tag of langs) {
