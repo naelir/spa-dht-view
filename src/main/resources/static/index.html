@@ -65,6 +65,28 @@
         /* Hide app until Vue has mounted to prevent flash of un-rendered template */
         [v-cloak] { display: none !important; }
 
+        /* Copy-to-clipboard toast */
+        .copy-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: var(--theme-dark);
+            color: #fff;
+            padding: .5rem 1rem;
+            border-radius: .375rem;
+            box-shadow: 0 .25rem .75rem rgba(0,0,0,.4);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .2s ease, transform .2s ease;
+            z-index: 2000;
+            font-size: .9rem;
+        }
+        .copy-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
         /* ── Mobile / smartphone layout ──────────────────────────────────── */
         @media (max-width: 767.98px) {
             /* Tighten outer padding */
@@ -169,6 +191,9 @@
         <button type="button" class="btn-close" @click="error = null"></button>
     </div>
 
+    <!-- Copy toast -->
+    <div class="copy-toast" :class="{ show: copyToastVisible }">✓ {{ t.copied }}</div>
+
     <!-- Toolbar -->
     <div class="card mb-3 shadow-sm">
         <div class="card-body py-2">
@@ -271,7 +296,7 @@
                     <tr v-for="e in entries" :key="e.id">
                         <td class="text-center">{{ e.g }}</td>
                         <td>{{ e.n || '—' }}</td>
-                        <td class="hash-col text-secondary">{{ e.h || '—' }}</td>
+                        <td class="hash-col text-secondary" style="cursor:pointer;" :title="e.h" @click="copyToClipboard(e.h)">{{ e.h || '—' }}</td>
                         <td class="text-center">{{ e.fc }}</td>
                         <td class="text-center">{{ formatBytes(e.sz) }}</td>
                         <td class="small">{{ formatDate(e.se) }}</td>
@@ -365,6 +390,14 @@
             .replace(/=+$/, '');
     }
 
+    const PREFIX = 'bWFnbmV0Oj94dD11cm46YnRpaDo=';
+    const SUFFIX = 'JnRyPXVkcCUzQSUyRiUyRm9wZW4uc3RlYWx0aC5zaSUzQTgwJTJGYW5ub3VuY2UmdHI9dWRwJTNBJTJGJTJGdHJhY2tlci50b3JyZW50LmV1Lm9yZyUzQTQ1MSUyRmFubm91bmNlJnRyPXVkcCUzQSUyRiUyRmV4cGxvZGllLm9yZyUzQTY5NjklMkZhbm5vdW5jZQ==';
+
+    function buildml(hash) {
+        return atob(PREFIX) + hash + atob(SUFFIX);
+    }
+
+
     const { createApp } = Vue;
 
     function mountApp(detectedLocale) {
@@ -383,7 +416,8 @@
                 searchQuery:  '',
                 activeSearch: '',
                 isSearchMode: false,
-                isAdmin:      false
+                isAdmin:      false,
+                copyToastVisible: false
             };
         },
 
@@ -521,6 +555,18 @@
                 script.src = `locale.${lang}.js?_=${Date.now()}`;
                 script.onload = () => { this.t = LOCALE; this.locale = lang; };
                 document.head.appendChild(script);
+            },
+
+            copyToClipboard(hash) {
+                if (!hash) return;
+//                 const ml = buildml(hash);
+                navigator.clipboard.writeText(hash).then(() => {
+                    this.copyToastVisible = true;
+                    clearTimeout(this._copyToastTimer);
+                    this._copyToastTimer = setTimeout(() => {
+                        this.copyToastVisible = false;
+                    }, 1500);
+                }).catch(() => {});
             },
 
             async deleteEntry(hash) {

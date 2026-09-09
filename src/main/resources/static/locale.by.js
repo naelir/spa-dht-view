@@ -22,4 +22,5 @@ window.LOCALE = {
     colFiles:           'файлы',
     colSize:            'памер',
     colActive:          'актыўны',
+    copied:             'Скапіравана',
 };

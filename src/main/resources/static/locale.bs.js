@@ -22,4 +22,5 @@ window.LOCALE = {
     colFiles:           'fajlovi',
     colSize:            'veličina',
     colActive:          'aktivno',
+    copied:             'Kopirano',
 };

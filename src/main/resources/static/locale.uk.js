@@ -22,4 +22,5 @@ window.LOCALE = {
     colFiles:           'файли',
     colSize:            'розмір',
     colActive:          'активний',
+    copied:             'Скопійовано',
 };

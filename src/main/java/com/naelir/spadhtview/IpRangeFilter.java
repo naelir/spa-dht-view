@@ -43,12 +43,17 @@ public class IpRangeFilter {
         LOG.info("[IpRangeFilter] Permanently banned IP: " + ip);
     }
 
+    public static String ip(byte[] ip) {
+        return String.format("%d.%d.%d.%d", Byte.toUnsignedInt(ip[0]), Byte.toUnsignedInt(ip[1]),
+                Byte.toUnsignedInt(ip[2]), Byte.toUnsignedInt(ip[3]));
+    }
+    
     public static boolean isAllowed(byte[] ip) {
         if (isDenied(ip)) return false;
         BigInteger address = toBigInteger(ip);
         for (IpRange ipRange : RANGES_ALLOW) {
             if (address.compareTo(ipRange.from) >= 0 && address.compareTo(ipRange.to) <= 0) {
-                LOG.info("[IpRangeFilter] Allowing IP: " + ip + "from country: " + (ipRange.country != null ? ipRange.country : UNKNOWN));
+                LOG.info("[IpRangeFilter] Allowing IP: " + ip(ip) + "from country: " + (ipRange.country != null ? ipRange.country : UNKNOWN));
                 return true;
             }
         }

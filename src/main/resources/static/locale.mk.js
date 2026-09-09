@@ -22,4 +22,5 @@ window.LOCALE = {
     colFiles:           'датотеки',
     colSize:            'големина',
     colActive:          'активен',
+    copied:             'Копирано',
 };

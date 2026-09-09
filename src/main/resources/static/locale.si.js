@@ -22,4 +22,5 @@ window.LOCALE = {
     colFiles:           'datoteke',
     colSize:            'velikost',
     colActive:          'aktivno',
+    copied:             'Kopirano',
 };

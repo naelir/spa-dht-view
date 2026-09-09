@@ -22,4 +22,5 @@ window.LOCALE = {
     colFiles:           'soubory',
     colSize:            'velikost',
     colActive:          'aktivní',
+    copied:             'Zkopírováno',
 };
