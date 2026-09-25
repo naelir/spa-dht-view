@@ -47,6 +47,9 @@
                  --bs-table-hover-bg: #243347; --bs-table-border-color: #2e3d50; }
         .table thead th { background-color: #0f1923; color: #c8d8e8; border-color: #2e3d50; }
         .table td, .table th { border-color: #2e3d50; color: #f0f4f8; }
+        /* Prevent horizontal scrolling from very long file names: wrap instead */
+        .table { table-layout: fixed; width: 100%; }
+        .table td:nth-child(2) { word-break: break-word; overflow-wrap: break-word; white-space: normal; }
         .text-muted { color: #a0b4c8 !important; }
         .text-secondary { color: #b0c4d8 !important; }
         /* Dark theme – inputs / selects */
@@ -285,7 +288,7 @@
                         <th style="width:80px" class="text-center">{{ t.colFiles }}</th>
                         <th style="width:80px" class="text-center">{{ t.colSize }}</th>
                         <th style="width:100px">{{ t.colActive }}</th>
-                        <th style="width:10px" class="text-center"></th>
+                        <th style="width:50px" class="text-center"></th>
                         <th style="width:60px" class="text-center" v-if="isAdmin"></th>
                     </tr>
                 </thead>

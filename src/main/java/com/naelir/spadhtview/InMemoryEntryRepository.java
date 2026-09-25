@@ -70,6 +70,7 @@ public class InMemoryEntryRepository implements EntryRepository {
         dst.fileCount = src.fileCount;
         dst.foundTime = src.foundTime;
         dst.size       = src.size;
+        dst.peers      = src.peers;
         return dst;
     }
 }
