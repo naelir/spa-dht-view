@@ -280,21 +280,31 @@
         <!-- Data table -->
         <div v-else class="table-responsive">
             <table class="table table-hover table-sm align-middle mb-0">
+                <colgroup>
+                    <col style="width:80px">
+                    <col>
+                    <col style="width:120px" class="hash-col">
+                    <col style="width:80px">
+                    <col style="width:80px">
+                    <col style="width:100px">
+                    <col style="width:50px">
+                    <col style="width:60px" v-if="isAdmin">
+                </colgroup>
                 <thead>
                     <tr>
-                        <th style="width:80px">{{ t.colGenre }}</th>
-                        <th >{{ t.colName }}</th>
-                        <th style="width:120px" class="hash-col">{{ t.colHash }}</th>
-                        <th style="width:80px" class="text-center">{{ t.colFiles }}</th>
-                        <th style="width:80px" class="text-center">{{ t.colSize }}</th>
-                        <th style="width:100px">{{ t.colActive }}</th>
-                        <th style="width:50px" class="text-center"></th>
-                        <th style="width:60px" class="text-center" v-if="isAdmin"></th>
+                        <th>{{ t.colGenre }}</th>
+                        <th>{{ t.colName }}</th>
+                        <th class="hash-col">{{ t.colHash }}</th>
+                        <th class="text-center">{{ t.colFiles }}</th>
+                        <th class="text-center">{{ t.colSize }}</th>
+                        <th>{{ t.colActive }}</th>
+                        <th class="text-center"></th>
+                        <th class="text-center" v-if="isAdmin"></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-if="entries.length === 0">
-                        <td colspan="8" class="text-center text-muted py-5">{{ t.noData }}</td>
+                        <td :colspan="isAdmin ? 8 : 7" class="text-center text-muted py-5">{{ t.noData }}</td>
                     </tr>
                     <tr v-for="e in entries" :key="e.id">
                         <td class="text-center">{{ e.g }}</td>
