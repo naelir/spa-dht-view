@@ -2,10 +2,13 @@ package com.naelir.spadhtview;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.bson.Document;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -20,10 +23,13 @@ public class MongoEntryRepository implements EntryRepository {
 
     private final MongoCollection<Document> collection;
 
+    private final Supplier<List<Entry>> getLastCache;
+
     public MongoEntryRepository(String connectionString, String dbName, String collectionName) {
         MongoClient client = MongoClients.create(connectionString);
         MongoDatabase database = client.getDatabase(dbName);
         this.collection = database.getCollection(collectionName);
+        this.getLastCache = Suppliers.memoizeWithExpiration(this::fetchLast, 3, TimeUnit.MINUTES);
         ensureIndexes();
     }
 
@@ -32,10 +38,8 @@ public class MongoEntryRepository implements EntryRepository {
         collection.createIndex(Indexes.ascending("n"));
         collection.createIndex(Indexes.descending("p"));
 
-    }
-
-    // ...existing code...
-
+    } 
+    
     @Override
     public List<Entry> findByName(String pattern) {
         if (pattern == null || pattern.trim().length() < 3)
@@ -58,6 +62,10 @@ public class MongoEntryRepository implements EntryRepository {
 
     @Override
     public List<Entry> getLast() {
+        return getLastCache.get();
+    }
+
+    private List<Entry> fetchLast() {
         List<Entry> results = new ArrayList<>();
         collection.find()
                 .sort(Sorts.descending("_id"))
@@ -88,12 +96,8 @@ public class MongoEntryRepository implements EntryRepository {
     public boolean remove(String hash) {
         long deleted = collection.deleteOne(Filters.eq("h", hash)).getDeletedCount();
         return deleted > 0;
-    }
-
-    // -------------------------------------------------------------------------
-    // helpers
-    // -------------------------------------------------------------------------
-
+    } 
+    
     private static Document toDocument(Entry e) {
         return new Document("h", e.hash)
                 .append("n", e.name)
