@@ -112,21 +112,34 @@
                 flex: 0 0 auto;
             }
 
-            /* Hide heavy table columns on small screens */
-            .table .hash-col,
-            .table thead th.hash-col {
+            /* Mobile: show only Name, Files and Size columns.
+               table-layout stays fixed so Files/Size keep a fixed width
+               and Name expands to take all remaining space. */
+            .table colgroup col:nth-child(1),
+            .table colgroup col:nth-child(3),
+            .table colgroup col:nth-child(6),
+            .table colgroup col:nth-child(7),
+            .table colgroup col:nth-child(8) {
                 display: none;
             }
-            /* Files & Size columns (3rd and 4th after name) */
-            .table td:nth-child(4),
-            .table th:nth-child(4),
-            .table td:nth-child(5),
-            .table th:nth-child(5) {
+            .table td:nth-child(1), .table th:nth-child(1),
+            .table td:nth-child(3), .table th:nth-child(3),
+            .table td:nth-child(6), .table th:nth-child(6),
+            .table td:nth-child(7), .table th:nth-child(7),
+            .table td:nth-child(8), .table th:nth-child(8) {
                 display: none;
+            }
+            /* Fixed width on Files & Size, remaining space goes to Name */
+            .table colgroup col:nth-child(4),
+            .table colgroup col:nth-child(5) {
+                width: 70px;
+            }
+            .table colgroup col:nth-child(2) {
+                width: auto;
             }
 
             /* Make the name column wrap instead of overflow */
-            .table td:nth-child(2) { word-break: break-word; max-width: 140px; }
+            .table td:nth-child(2) { word-break: break-word; }
 
             /* Toolbar: stack search + controls */
             .card-body .row { flex-direction: column; }
