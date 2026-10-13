@@ -403,7 +403,7 @@
             const key = tag.split('-')[0].toLowerCase();
             if (LANG_MAP[key]) return LANG_MAP[key];
         }
-        return 'bg'; // default fallback
+        return 'isv'; // default fallback
     }
 
     function t() {
@@ -626,10 +626,10 @@
         script.src = 'locale.' + locale + '.js';
         script.onload = function () { mountApp(locale); };
         script.onerror = function () {
-            // Fallback: try 'bg' if detected locale file fails to load
+            // Fallback: try 'isv' if detected locale file fails to load
             const fallback = document.createElement('script');
-            fallback.src = 'locale.bg.js';
-            fallback.onload = function () { mountApp('bg'); };
+            fallback.src = 'locale.isv.js';
+            fallback.onload = function () { mountApp('isv'); };
             document.head.appendChild(fallback);
         };
         document.head.appendChild(script);
