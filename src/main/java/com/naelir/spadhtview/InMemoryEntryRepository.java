@@ -1,7 +1,10 @@
 package com.naelir.spadhtview;
 
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 
@@ -15,19 +18,28 @@ public class InMemoryEntryRepository implements EntryRepository {
 
     private final CopyOnWriteArrayList<Entry> store = new CopyOnWriteArrayList<>();
 
-
-
     @Override
-    public List<Entry> getLast() {
-        return store.stream()
+    public Map<String, Object> getLast() {
+        List<Entry> results = store.stream()
                 .sorted(Comparator.comparingLong((Entry e) -> e.foundTime).reversed())
                 .limit(50)
                 .toList();
+        
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("entries",    results);
+        body.put("total",      count());
+        return body;
     }
 
     @Override
     public long count() {
         return store.size();
+    }
+    
+    @Override
+    public List<Entry> getPopular() {
+        return Collections.emptyList();
     }
 
     @Override

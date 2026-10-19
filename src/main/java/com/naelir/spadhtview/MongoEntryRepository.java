@@ -1,11 +1,16 @@
 package com.naelir.spadhtview;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -23,13 +28,15 @@ public class MongoEntryRepository implements EntryRepository {
 
     private final MongoCollection<Document> collection;
 
-    private final Supplier<List<Entry>> getLastCache;
+    private final Supplier<Map<String, Object>> getLastCache;
+    private final Supplier<List<Entry>> getPopularCache;
 
     public MongoEntryRepository(String connectionString, String dbName, String collectionName) {
         MongoClient client = MongoClients.create(connectionString);
         MongoDatabase database = client.getDatabase(dbName);
         this.collection = database.getCollection(collectionName);
         this.getLastCache = Suppliers.memoizeWithExpiration(this::fetchLast, 3, TimeUnit.MINUTES);
+        this.getPopularCache = Suppliers.memoizeWithExpiration(this::fetchPopular, 60, TimeUnit.MINUTES);
         ensureIndexes();
     }
 
@@ -61,14 +68,34 @@ public class MongoEntryRepository implements EntryRepository {
     }
 
     @Override
-    public List<Entry> getLast() {
+    public Map<String, Object> getLast() {
         return getLastCache.get();
     }
 
-    private List<Entry> fetchLast() {
+    private Map<String, Object> fetchLast() {
         List<Entry> results = new ArrayList<>();
         collection.find()
                 .sort(Sorts.descending("_id"))
+                .limit(50)
+                .forEach(doc -> results.add(fromDocument(doc)));
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("entries",    results);
+        body.put("total",      count());
+        return body;
+    }
+
+    @Override
+    public List<Entry> getPopular() {
+        return getPopularCache.get();
+    }
+    
+    private List<Entry> fetchPopular() {
+        Date twentyFourHoursAgo = Date.from(Instant.now().minusSeconds(24 * 60 * 60));
+        ObjectId cutoffId = new ObjectId(twentyFourHoursAgo);
+        List<Entry> results = new ArrayList<>();
+        collection.find(Filters.gte("_id", cutoffId))
+                .sort(Sorts.descending("p"))
                 .limit(50)
                 .forEach(doc -> results.add(fromDocument(doc)));
         return results;

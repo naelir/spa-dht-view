@@ -1,6 +1,5 @@
 package com.naelir.spadhtview;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -36,12 +35,21 @@ public class EntryResource {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        List<Entry> entries = repo.getLast();
+        Map<String, Object> entries = repo.getLast();
+        return Response.ok(entries).build();
+    }
+    
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("entries",    entries);
-        body.put("total",      repo.count());
-        return Response.ok(body).build();
+    @GET
+    @Path("/popular")
+    public Response popular(@QueryParam("token") String token) {
+
+        if (!TokenValidator.isValidReadToken(token)) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        List<Entry> entries = repo.getPopular();
+        return Response.ok(entries).build();
     }
 
     /**
